@@ -1,0 +1,4 @@
+int
+double
+float
+string
