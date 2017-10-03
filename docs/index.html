@@ -16,13 +16,10 @@
       <h2>Natural language interpreted down to NASM Assembly.</h2>
     </header>
     <section class="center-div">
-      <form class="nlArea" action="/cgi-bin/handler.py" method="get">
-        <textarea name="nlcode" id  = "sCde" autofocus value="Start Typing Here..."></textarea>
+      <form class="nlArea" action="cgi-bin/handle.py" method="get">
+        <textarea name="nlcode" id  = "sCde" autofocus placeholder="Start Typing Here..."></textarea>
         <input type="submit" name="intrnl" value="Interpret">
       </form>
-    </section>
-
-    <section class="output">
     </section>
 
     <footer><h3>Ryan Stonebraker © 2017</h3></footer>
