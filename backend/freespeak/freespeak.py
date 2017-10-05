@@ -4,15 +4,9 @@ from freespeak import categorizer
 # from freespeak import synonymfinder
 from freespeak import taskhandle
 
-def identify(nltext, debug = False):
-    debug = True
-
+def identify(nltext):
     parsed = re.split(r"\.+\s+|\n+|\.$", nltext)
     parsed = [entry for entry in parsed if entry != ""]
 
     labeled = [categorizer.label(sentence) for sentence in parsed]
-
-
-
-    if debug:
-        return labeled
+    return labeled

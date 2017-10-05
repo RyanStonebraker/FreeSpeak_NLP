@@ -9,6 +9,7 @@ currDIR = os.path.dirname(os.path.realpath(__file__))
 freeDir = currDIR.replace("/docs/cgi-bin", "/backend")
 sys.path.append(freeDir)
 from freespeak import freespeak
+from freespeak import nasminterpret
 
 cgitb.enable()
 
@@ -34,5 +35,5 @@ print ("<footer><h3>Ryan Stonebraker &copy; 2017</h3></footer></body></html>")
 
 if len(nlraw) > 0:
     print("<section class=\"output\"><h4>OUTPUT:</h4>")
-    print(freespeak.identify(nlraw, debug = True))
+    print("<p>",nasminterpret.nl_to_nasm(nlraw).replace("\n", "</br></br>"), "</p>")
     print ("</section>")
