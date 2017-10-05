@@ -1,13 +1,23 @@
 #!/Users/Ryan/Documents/Programming/ML/Anaconda3/bin/python3
+# -- USE THIS FOR UBUNTU MACHINES -- #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-# enable debugging
 import cgi, cgitb
 import sys
-sys.path.append("/Users/Ryan/Documents/College-UAF/Classwork/Assembly/NLP_interpretted_NASM/FreeSpeak_NLP/backend")
+import os
+
+currDIR = os.path.dirname(os.path.realpath(__file__))
+freeDir = currDIR.replace("/docs/cgi-bin", "/backend")
+sys.path.append(freeDir)
 from freespeak import freespeak
 
+cgitb.enable()
 
 form = cgi.FieldStorage()
-nlraw = form.getvalue('nlcode').rstrip('\n')
+
+nlraw = ""
+
+if 'nlcode' in form:
+    nlraw = form.getvalue('nlcode').rstrip()
 
 print("Content-Type: text/html;charset=utf-8\n")
 
@@ -24,10 +34,5 @@ print ("<footer><h3>Ryan Stonebraker &copy; 2017</h3></footer></body></html>")
 
 if len(nlraw) > 0:
     print("<section class=\"output\"><h4>OUTPUT:</h4>")
-
-print(freespeak.handle(nlraw))
-
-# print(nlraw.replace("\n", "</br>"))
-
-if len(nlraw) > 0:
+    print(freespeak.identify(nlraw, debug = True))
     print ("</section>")

@@ -1,6 +1,8 @@
 import os
+import re
 import sys
 from freespeak import synonymfinder
+from freespeak import taskhandle
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 # GLOBAL MARKERS
 stdsyn = {}
@@ -28,14 +30,13 @@ def _loadCache():
         with open(CACHE_DIR + "_synlist_.txt", "r") as synlist:
             for line in synlist:
                 line = line.replace("\n", "")
-                stdsyn[line[:line.find(":")]] = line[line.find(":"):]
+                stdsyn[line[:line.find(":")]] = line[line.find(":")+1:]
 
     if os.path.isfile(CACHE_DIR + "_TASK_.txt"):
         with open(CACHE_DIR + "_TASK_.txt", "r") as _glbltask:
             for line in _glbltask:
                 line = line.replace("\n", "")
                 _TASK.append(line)
-                line = line.replace("\n", "")
 
     if os.path.isfile(CACHE_DIR + "_STRUCTURE_.txt"):
         with open(CACHE_DIR + "_STRUCTURE_.txt", "r") as _glblstrct:
@@ -67,10 +68,14 @@ def deconstruct (snt):
 
 def matchword(wrd):
     lbl = ""
+    wrd = wrd.strip("s,'[]\{\}\\/|")
+
     if wrd in stdsyn:
         wrd = stdsyn[wrd]
 
-    if wrd in _TASK:
+    if wrd.isnumeric():
+        lbl = "NUMBER"
+    elif wrd in _TASK:
         lbl = "TASK"
     elif wrd in _STRUCTURE:
         lbl = "STRUCTURE"
@@ -81,17 +86,45 @@ def matchword(wrd):
     elif wrd in _SUPERFLUOUS:
         lbl = "SUPERFLUOUS"
     else:
-        lbl = synonymfinder.find(wrd)
-    # print(sys.path)
+        wrdlbl = synonymfinder.find(wrd)
+        lbl = wrdlbl[1]
+        wrd = wrdlbl[0]
     return (wrd, lbl)
+
+def _unloadCache():
+    BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+    CACHE_DIR = BASE_DIR + "/wordcache/"
+
+    with open(CACHE_DIR + "_synlist_.txt", "w") as _outSYN:
+        for key in stdsyn:
+            _outSYN.write(key + ":" + stdsyn[key] + "\n")
+    with open(CACHE_DIR + "_MODIFIER_.txt", "w") as _outMOD:
+        for line in _MODIFIER:
+            _outMOD.write(line + "\n")
+    with open(CACHE_DIR + "_STRUCTURE_.txt", "w") as _outSTRUCT:
+        for line in _STRUCTURE:
+            _outSTRUCT.write(line + "\n")
+    with open(CACHE_DIR + "_SUPERFLUOUS_.txt", "w") as _outSPR:
+        for line in _SUPERFLUOUS:
+            _outSPR.write(line + "\n")
+    with open(CACHE_DIR + "_TASK_.txt", "w") as _outTASK:
+        for line in _TASK:
+            _outTASK.write(line + "\n")
+    with open(CACHE_DIR + "_TYPE_.txt", "w") as _outTYPE:
+        for line in _TYPE:
+            _outTYPE.write(line + "\n")
 
 def label (sentence):
     _loadCache()
 
+    sentence = sentence.replace(" and ", " ")
+    sentence = sentence.replace(",", " ")
+    sentence = sentence.replace ("  ", " ")
+
     sentence = deconstruct(sentence)
 
     sentence = [matchword(word) for word in sentence]
-    # print("Test")
-    return sentence
 
-# print(label("This is a test."))
+    _unloadCache()
+
+    return taskhandle.getcontext(sentence)

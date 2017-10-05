@@ -1,4 +1,4 @@
-int
-double
-float
+integer
 string
+character
+boolean
