@@ -1,6 +1,7 @@
 import requests
 from freespeak import categorizer
 
+
 def webscrape(wrd):
     url = "http://words.bighugelabs.com/api/2/1166c33a777038684549d7422cc054fc/" + wrd + "/json"
     results = requests.get(url)

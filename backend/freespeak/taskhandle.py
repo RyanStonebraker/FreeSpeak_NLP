@@ -14,8 +14,8 @@ def getcontext(snt):
             modFlag = False
             modListFlag = False
 
-    for index in range(len(snt)-1, -1, -1):
-        if snt[index][1] == "NUMBER" or snt[index][1] == "SUPERFLUOUS":
+    for index in range(len(snt) - 1, -1, -1):
+        if snt[index][1] == "NUMBER" or snt[index][0] == "":
             snt.pop(index)
 
     return snt

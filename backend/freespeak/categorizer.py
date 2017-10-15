@@ -13,13 +13,13 @@ _TYPE = []
 _SUPERFLUOUS = []
 
 
-
 # CURRENT WORD MARKERS
 task_ = []
 structure_ = []
 modifier_ = []
 type_ = []
 superfluous_ = []
+
 
 def _loadCache():
 
@@ -30,7 +30,7 @@ def _loadCache():
         with open(CACHE_DIR + "_synlist_.txt", "r") as synlist:
             for line in synlist:
                 line = line.replace("\n", "")
-                stdsyn[line[:line.find(":")]] = line[line.find(":")+1:]
+                stdsyn[line[:line.find(":")]] = line[line.find(":") + 1:]
 
     if os.path.isfile(CACHE_DIR + "_TASK_.txt"):
         with open(CACHE_DIR + "_TASK_.txt", "r") as _glbltask:
@@ -62,9 +62,11 @@ def _loadCache():
                 line = line.replace("\n", "")
                 _SUPERFLUOUS.append(line)
 
-def deconstruct (snt):
+
+def deconstruct(snt):
     snt = snt.lower()
     return snt.split(" ")
+
 
 def matchword(wrd):
     lbl = ""
@@ -91,35 +93,39 @@ def matchword(wrd):
         wrd = wrdlbl[0]
     return (wrd, lbl)
 
+
 def _unloadCache():
     BASE_DIR = os.path.dirname(os.path.realpath(__file__))
     CACHE_DIR = BASE_DIR + "/wordcache/"
 
     with open(CACHE_DIR + "_synlist_.txt", "w") as _outSYN:
-        for key in stdsyn:
+        for key in set(stdsyn):
             _outSYN.write(key + ":" + stdsyn[key] + "\n")
     with open(CACHE_DIR + "_MODIFIER_.txt", "w") as _outMOD:
-        for line in _MODIFIER:
+        for line in set(_MODIFIER):
             _outMOD.write(line + "\n")
     with open(CACHE_DIR + "_STRUCTURE_.txt", "w") as _outSTRUCT:
-        for line in _STRUCTURE:
+        for line in set(_STRUCTURE):
             _outSTRUCT.write(line + "\n")
     with open(CACHE_DIR + "_SUPERFLUOUS_.txt", "w") as _outSPR:
-        for line in _SUPERFLUOUS:
+        for line in set(_SUPERFLUOUS):
             _outSPR.write(line + "\n")
     with open(CACHE_DIR + "_TASK_.txt", "w") as _outTASK:
-        for line in _TASK:
+        for line in set(_TASK):
             _outTASK.write(line + "\n")
     with open(CACHE_DIR + "_TYPE_.txt", "w") as _outTYPE:
-        for line in _TYPE:
+        for line in set(_TYPE):
             _outTYPE.write(line + "\n")
 
-def label (sentence):
+
+def label(sentence):
     _loadCache()
 
+    sentence = sentence.replace("  ", " ")
     sentence = sentence.replace(" and ", " ")
+    sentence = sentence.replace(" & ", " ")
     sentence = sentence.replace(",", " ")
-    sentence = sentence.replace ("  ", " ")
+    sentence = sentence.replace("  ", " ")
 
     sentence = deconstruct(sentence)
 

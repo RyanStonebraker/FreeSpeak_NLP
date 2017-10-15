@@ -4,6 +4,7 @@ from freespeak import categorizer
 # from freespeak import synonymfinder
 from freespeak import taskhandle
 
+
 def identify(nltext):
     parsed = re.split(r"\.+\s+|\n+|\.$", nltext)
     parsed = [entry for entry in parsed if entry != ""]

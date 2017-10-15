@@ -1,10 +1,37 @@
 @bg-text: #ededed;
 @background: #1e252b;
 
+@keyframes opacityDropDown {
+  0% {
+    opacity: 0%;
+    transform: translateY(-10%);
+  }
+  100% {
+    opacity: 100%;
+    transform: translateY(0%);
+  }
+}
+
+/* Mixin */.box-shadow (@x: 0px, @y: 3px, @blur: 5px, @z-index:-10px, @acolor: #ffffff) {
+-webkit-box-shadow: @x @y @blur @z-index @acolor;
+-moz-box-shadow: @x @y @blur @z-index @acolor;
+box-shadow: @x @y @blur @z-index @acolor;
+}
+
+
+.line-sep {
+  border-style: solid;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: thin solid #000000;
+  margin: auto;
+  width: 80%;
+  margin-bottom: 2vh;
+}
+
 html {
   background: url("../img/bg1.jpg") no-repeat fixed;
-  // background: linear-gradient(rgba(0, 168, 196, 0.7), rgba(0, 124, 145, 0.9));
-  // background-blend-mode:luminosity;
   -webkit-background-attachment: fixed;
   -moz-background-attachment: fixed;
   -o-background-attachment: fixed;
@@ -96,6 +123,7 @@ input[name=intrnl]:active {
 }
 
 .output {
+  animation: 0.2s ease-out 0s 1 opacityDropDown;
   .transition(all, 0.5s, ease-in);
   width: 65%;
   margin-top: 2vh;
@@ -109,6 +137,7 @@ input[name=intrnl]:active {
 }
 
 footer {
+  .box-shadow(0, 0.5vw, 5vw, -10px, #000000);
   background-color: @bg-text;
   position:fixed;
   bottom:0;

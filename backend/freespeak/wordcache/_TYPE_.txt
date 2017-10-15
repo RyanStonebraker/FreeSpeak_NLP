@@ -1,4 +1,4 @@
-integer
-string
-character
 boolean
+character
+string
+integer
