@@ -1,2 +1,7 @@
+exclude
 of
+through
+without
+include
+by
 with

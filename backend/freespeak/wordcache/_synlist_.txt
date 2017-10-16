@@ -1,4 +1,5 @@
-build:make
+then:
 construct:make
+build:make
 create:make
 matrix:array

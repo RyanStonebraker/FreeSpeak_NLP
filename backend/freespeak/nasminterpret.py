@@ -17,6 +17,7 @@ def lea_op(*params, reg="rdi"):
 
 
 def nl_to_nasm(labeled):
+    return str(labeled)
     """NASM Assembly language pack for Freespeak NLP Engine."""
     nasmcode = ""
     externed = []

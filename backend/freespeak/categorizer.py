@@ -22,7 +22,6 @@ superfluous_ = []
 
 
 def _loadCache():
-
     BASE_DIR = os.path.dirname(os.path.realpath(__file__))
     CACHE_DIR = BASE_DIR + "/wordcache/"
 
@@ -68,14 +67,26 @@ def deconstruct(snt):
     return snt.split(" ")
 
 
+def checkNum(str_num):
+    if str_num.isnumeric():
+        return True
+    else:
+        try:
+            float(str_num)
+            return True
+        except:
+            return False
+    return False
+
+
 def matchword(wrd):
     lbl = ""
-    wrd = wrd.strip("s,'[]\{\}\\/|")
+    wrd = wrd.strip(",'[]\{\}\\/|")
 
     if wrd in stdsyn:
         wrd = stdsyn[wrd]
 
-    if wrd.isnumeric():
+    if checkNum(wrd):
         lbl = "NUMBER"
     elif wrd in _TASK:
         lbl = "TASK"

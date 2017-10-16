@@ -1,1 +1,4 @@
+deconstruction
+this
 array
+output

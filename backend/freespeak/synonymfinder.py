@@ -3,12 +3,17 @@ from freespeak import categorizer
 
 
 def webscrape(wrd):
-    url = "http://words.bighugelabs.com/api/2/1166c33a777038684549d7422cc054fc/" + wrd + "/json"
+    api_key = "1166c33a777038684549d7422cc054fc"
+    url = "http://words.bighugelabs.com/api/2/" + api_key + "/" + wrd + "/json"
     results = requests.get(url)
     if results.status_code == 200:
         results = results.json()
         results = [results[key] for key in results]
-        results = results[0]['syn']
+        try:
+            results = results[0]['syn']
+        except:
+            print("<script>console.log(" + wrd + ");</script>")
+            return [""]
     else:
         results = ""
     return results

@@ -1,13 +1,10 @@
 
-bbbb
-an
-cc
-value
-then
-000
-a
-the
-da
 finally
-aaa
-dddd
+a
+-
+an
+da
+0.5
+the
+them
+values

@@ -12,6 +12,7 @@ sys.path.append(freeDir)
 from freespeak import freespeak
 from freespeak import nasminterpret
 
+# TURN OFF FOR FINAL *******************************************************
 cgitb.enable()
 
 form = cgi.FieldStorage()
@@ -37,7 +38,7 @@ print("""
 <footer><h3>Ryan Stonebraker &copy; 2017</h3></footer></body></html>
 """)
 
-deconstruct = True
+deconstruct = False
 
 if len(nlraw) > 0:
     identified_lang = freespeak.identify(nlraw)
@@ -52,7 +53,6 @@ if len(nlraw) > 0:
         type_str = """<div class = "line-sep" style = "margin-bottom: 0;"></div>"""
         param_str = """<div class = "line-sep" style = "margin-bottom: 0;"></div>"""
 
-        firstSent = True
         for count, sent in enumerate(identified_lang):
             task_out = [category for category in sent if category[1] == "TASK"]
             for task_raw in task_out:
