@@ -155,8 +155,11 @@ def label(sentence):
     sentence = sentence.replace(" and ", " ")
     sentence = sentence.replace(" & ", " ")
     sentence = sentence.replace(",", " ")
+    sentence = sentence.replace("+", " plus ")
+    sentence = sentence.replace("-", " minus ")
+    sentence = sentence.replace("*", " multiplied ")
+    sentence = sentence.replace("/", " divided ")
     sentence = sentence.replace("  ", " ")
-    sentence = sentence.replace("+", " + ")
 
     sentence = deconstruct(sentence)
 

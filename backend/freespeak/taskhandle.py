@@ -29,18 +29,12 @@ def maybe_num(param):
         return param
 
 
+def roundCutOff(num):
+    return ('%f' % num).rstrip('0').rstrip('.')
+
+
 def through_mod(begin, end, inc=1):
     return [maybe_num(('%f' % num).rstrip('0').rstrip('.')) for num in numpy.arange(begin + inc, end + inc, inc)]
-
-
-def addAll(addArr):
-    total = 0
-    for num in addArr:
-        try:
-            total += to_num(num)
-        except:
-            return 0
-    return total
 
 
 def convertParam(param, ctype):
@@ -89,6 +83,21 @@ def autoConvert(params):
 def getcontext(snt_raw):
     # print(snt_raw)
     snt = [wrd for wrd in snt_raw if wrd[0] != '' and wrd[1] != "SUPERFLUOUS"]
+    # print(snt)
+
+    # PRE-MAIN PROCESSING LOOP (HANDLES PEMDAS)
+    for index, word in enumerate(snt):
+        if snt[index][1] == "MODIFIER":
+            if snt[index][0] == "multiplied" and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
+                snt[index - 1] = (str(roundCutOff(to_num(snt[index - 1][0]) * to_num(snt[index + 1][0]))), "NUMBER")
+                del snt[index]
+                del snt[index]
+            elif snt[index][0] == "divided" and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
+                # print("<script>console.log(" + str(((to_num(snt[index - 1][0]) / to_num(snt[index + 1][0])), "NUMBER")[) + ")</script>")
+                snt[index - 1] = (str(roundCutOff(to_num(snt[index - 1][0]) / to_num(snt[index + 1][0]))), "NUMBER")
+                del snt[index]
+                del snt[index]
+
     print(snt)
 
     ordered_jobs = []
