@@ -89,10 +89,13 @@ def checkString(poss_str):
     return False
 
 
+def checkBool(poss_str):
+    return((poss_str == "true" or poss_str == "false"), poss_str == "true")
+
+
 def matchword(wrd):
     lbl = ""
     wrd = wrd.strip(",'[]\{\}\\/|")
-
     if wrd in stdsyn:
         wrd = stdsyn[wrd]
 
@@ -101,6 +104,9 @@ def matchword(wrd):
     elif checkString(wrd):
         wrd = wrd[1:-1]
         lbl = "STRING"
+    elif checkBool(wrd)[0]:
+        wrd = checkBool(wrd)[1]
+        lbl = "BOOLEAN"
     elif wrd in _TASK:
         lbl = "TASK"
     elif wrd in _STRUCTURE:
@@ -150,6 +156,7 @@ def label(sentence):
     sentence = sentence.replace(" & ", " ")
     sentence = sentence.replace(",", " ")
     sentence = sentence.replace("  ", " ")
+    sentence = sentence.replace("+", " + ")
 
     sentence = deconstruct(sentence)
 

@@ -1,4 +1,4 @@
-deconstruction
-this
-array
 output
+this
+deconstruction
+array

@@ -1,8 +1,10 @@
-exclude
-not
-include
-with
 by
+not
 of
+with
 without
 through
+plus
+include
+exclude
+minus

@@ -1,5 +1,5 @@
-character
-float
 integer
-string
+character
 boolean
+float
+string
