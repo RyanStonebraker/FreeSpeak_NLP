@@ -64,7 +64,9 @@ def _loadCache():
 
 def deconstruct(snt):
     snt = snt.lower()
-    return snt.split(" ")
+    pattern = re.compile(r'''((?:[^ "]|"[^"]*")+)''')
+
+    return [wrd for wrd in pattern.split(snt) if wrd != "" and wrd != " "]
 
 
 def checkNum(str_num):
@@ -79,6 +81,14 @@ def checkNum(str_num):
     return False
 
 
+# Can't return re.match because it returns object, but python if statements
+# can check "truthness" of a statement (not a bool)
+def checkString(poss_str):
+    if re.match(r'^\"(.)+\"$', poss_str):
+        return True
+    return False
+
+
 def matchword(wrd):
     lbl = ""
     wrd = wrd.strip(",'[]\{\}\\/|")
@@ -88,6 +98,9 @@ def matchword(wrd):
 
     if checkNum(wrd):
         lbl = "NUMBER"
+    elif checkString(wrd):
+        wrd = wrd[1:-1]
+        lbl = "STRING"
     elif wrd in _TASK:
         lbl = "TASK"
     elif wrd in _STRUCTURE:

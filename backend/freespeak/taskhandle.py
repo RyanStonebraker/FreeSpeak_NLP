@@ -2,8 +2,13 @@ import numpy
 import collections
 # import pdb
 
+# IDEA: Return a class containing the "stack" order of task execution, current "this" keyword reference,
+# various flags for output, etc.
 
-def structure_output(task="make", structure="array", params=[]):
+
+def structure_output(task="", structure="", params=[]):
+    if task == "":
+        return
     return {"TASK": task, "STRUCTURE": structure, "PARAMETERS": params}
 
 
@@ -25,7 +30,7 @@ def maybe_num(param):
 
 
 def through_mod(begin, end, inc=1):
-    return [maybe_num(('%f' % num).rstrip('0').rstrip('.')) for num in numpy.arange(begin + inc, end, inc)]
+    return [maybe_num(('%f' % num).rstrip('0').rstrip('.')) for num in numpy.arange(begin + inc, end + inc, inc)]
 
 
 def convertParam(param, ctype):
@@ -72,6 +77,18 @@ def autoConvert(params):
 
 
 def getcontext(snt_raw):
+    # snt = []
+    #
+    # save_sup = False
+    # for word in snt_raw:
+    #     if word[0] == "":
+    #         continue
+    #     if word[1] == "TASK":
+    #         del_sup = True
+    #
+    #     if word[1] != "SUPERFLUOUS" or (word[1] == "SUPERFLUOUS" and not del_sup):
+    #         snt.append(word)
+
     # print(snt_raw)
     snt = [wrd for wrd in snt_raw if wrd[0] != '' and wrd[1] != "SUPERFLUOUS"]
     print(snt)
@@ -83,8 +100,21 @@ def getcontext(snt_raw):
     c_task = ""
     c_structure = ""
     c_type = "auto"
+    ignore_next = False
+
     for index, word in enumerate(snt):
+        # Pre Task Modifiers
+        if snt[index][1] == "MODIFIER" and not start_find:
+            if snt[index][0] == "not":
+                ignore_next = True
+                continue
+
         if snt[index][1] == "TASK" and start_find:
+            # Inner Pre Task Modifiers
+            if snt[index - 1][1] == "MODIFIER":
+                if snt[index - 1][0] == "not":
+                    start_find = False
+                    continue
             if c_type == "auto":
                 current_params = autoConvert(current_params)
             else:
@@ -98,6 +128,9 @@ def getcontext(snt_raw):
             continue
 
         if snt[index][1] == "TASK" and not start_find:
+            if ignore_next:
+                ignore_next = False
+                continue
             start_find = True
             c_task = snt[index][0]
             continue
@@ -109,7 +142,7 @@ def getcontext(snt_raw):
 
             # MODIFIER SUBROUTINES
             if snt[index][1] == "MODIFIER":
-                if snt[index][0] == "with" or snt[index][0] == "include":
+                if snt[index][0] == "with" or snt[index][0] == "include" or snt[index][0] == "of":
                     modForwardParams = True
                     continue
 
@@ -129,21 +162,21 @@ def getcontext(snt_raw):
                 c_type = snt[index][0]
                 continue
 
-            if modForwardParams and snt[index][1] != "NUMBER":
+            if modForwardParams and (snt[index][1] != "NUMBER" and snt[index][1] != "STRING"):
                 modForwardParams = False
 
-            if modForwardParams and snt[index][1] == "NUMBER":
-                current_params.append(to_num(snt[index][0]))
+            if modForwardParams and (snt[index][1] == "NUMBER" or snt[index][1] == "STRING"):
+                current_params.append(maybe_num(snt[index][0]))
                 snt[index] = (snt[index][0], "PARAMETER")
                 continue
 
-    print (c_type)
     if c_type == "auto":
         current_params = autoConvert(current_params)
     else:
         current_params = convertParams(current_params, c_type)
 
-    ordered_jobs.append(structure_output(task=c_task, structure=c_structure, params=current_params))
+    if c_task != "":
+        ordered_jobs.append(structure_output(task=c_task, structure=c_structure, params=current_params))
 
     # Clean up loop, removes numbers/spaces that doesn't know how to deal with
     for index in range(len(snt) - 1, -1, -1):

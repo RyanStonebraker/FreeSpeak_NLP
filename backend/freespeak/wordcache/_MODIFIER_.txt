@@ -1,7 +1,8 @@
 exclude
-of
-through
-without
+not
 include
-by
 with
+by
+of
+without
+through

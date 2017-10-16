@@ -1,5 +1,7 @@
-then:
-construct:make
 build:make
-create:make
 matrix:array
+create:make
+in:
+construct:make
+then:
+dont:not
