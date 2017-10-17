@@ -1,5 +1,6 @@
 """Includes the main library module."""
 from freespeak import freespeak
+from freespeak import taskhandle
 import math
 
 
@@ -48,7 +49,7 @@ def lea_op(*params, reg="rdi", stype="QWORD"):
     return op_str + "\n"
 
 
-def mov_op(src, dest, stype=" "):
+def mov_op(dest, src, stype=" "):
     if stype != " ":
         dest += " "
         stype += " "
@@ -63,16 +64,47 @@ def mov_bracket_op(*dest, src, stype="QWORD"):
     return mv_str + "\n"
 
 
-def instantiate_array(params, p_type):
+# def print_array(arr):
+#     iarray_print
+#     larray_print
+#     farray_print
+
+
+def instantiate_array(params, p_type, index=0):
     array_str = ""
+    lbl = "arr_struct" + str(index)
+    flag = "c_loc"
     if p_type == "integer":
         p_size = 8
         array_str += alloc_size_lea(len(params))
         array_str += "call malloc\n"
         for count, param in enumerate(params):
             array_str += mov_bracket_op("rax", count * p_size, src=param)
-        # array_str += mov_op("rax", sv)
-    return array_str
+    elif p_type == "float":
+        flag = "end"
+        array_str += lbl + ":\n"
+        array_str += "dd " + str(params[0])
+        for param in params[1:]:
+            array_str += ", " + str(param)
+        array_str += "\n"
+    elif p_type == "boolean":
+        p_size = 1
+        swap_str = 0
+        array_str += alloc_size_lea(len(params))
+        array_str += "call malloc\n"
+        for count, param in enumerate(params):
+            if param == "True" or taskhandle.to_num(param) >= 1:
+                swap_str = 1
+            elif param == "False" or taskhandle.to_num(param) == 0:
+                swap_str = 0
+            array_str += mov_bracket_op("rax", count * p_size, src=swap_str)
+    elif p_type == "string":
+        flag = "end"
+        array_str += lbl + ":\n"
+        for param in params:
+            array_str += "dq \"" + str(param) + "\"\n"
+        array_str += "dq 0\n"
+    return (array_str, flag, lbl)
 
 
 def add_section(sect):
@@ -83,10 +115,10 @@ def add_section(sect):
 # like "print this array.", "print the 2nd array.", etc. and "exclude 3,4,5 from 2nd array."
 # (exclude is a task)
 def nl_to_nasm(labeled):
-    # return str(labeled)
     """NASM Assembly language pack for Freespeak NLP Engine."""
     nasmcode = ""
     loaded_externs = add_section("text")
+    data_section = ""
     task_stack = []
     save_stack = []
     for sent in labeled:
@@ -95,19 +127,28 @@ def nl_to_nasm(labeled):
                 task_stack.append(tsk)
     # return str(task_stack)
 
-    for exectask in task_stack:
+# TODO: Write a function that writes assembly that realloc (variant of malloc) an array
+# to store pointers to data structures so I can call functions
+
+    for index, exectask in enumerate(task_stack):
         # make == allocate space for some structure
         if exectask["TASK"] == "make":
-            if "malloc" not in loaded_externs:
-                loaded_externs += load_module("malloc")
-            if "free" not in loaded_externs:
-                loaded_externs += load_module("free")
-
             if exectask["STRUCTURE"] == "array":
-                nasmcode += instantiate_array(exectask["PARAMETERS"], exectask["TYPE"])
-                nasmcode += "push rax\n"
-                save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
+                auto_arr = instantiate_array(exectask["PARAMETERS"], exectask["TYPE"], index)
+                if auto_arr[1] == "c_loc":
+                    if "malloc" not in loaded_externs:
+                        loaded_externs += load_module("malloc")
+                    if "free" not in loaded_externs:
+                        loaded_externs += load_module("free")
+                    nasmcode += auto_arr[0]
+                    nasmcode += "push rax\n"
+                    save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
+                elif auto_arr[1] == "end":
+                    if len(data_section) == 0:
+                        data_section += add_section("data")
+                    data_section += auto_arr[0]
+
     for pop_task in reversed(save_stack):
         nasmcode += pop_task[0]
     nasmcode += "ret\n"
-    return loaded_externs + nasmcode
+    return loaded_externs + nasmcode + data_section

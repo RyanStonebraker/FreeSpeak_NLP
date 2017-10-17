@@ -43,7 +43,7 @@ deconstruct = False
 if len(nlraw) > 0:
     identified_lang = freespeak.identify(nlraw)
     print("""<section class="output"><h4>NASM INTERPRETATION:</h4><div class="line-sep"></div>""")
-    print("<p>", nasminterpret.nl_to_nasm(identified_lang).replace("\n", "</br></br>"), "</p>")
+    print("<p style = \"text-align: left;\">", nasminterpret.nl_to_nasm(identified_lang).replace("\n", "</br></br>"), "</p>")
     if deconstruct:
         print("""<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""")
         task_str = """<div class = "line-sep" style = "margin-bottom: 0;"></div>"""
