@@ -98,8 +98,6 @@ def getcontext(snt_raw):
                 del snt[index]
                 del snt[index]
 
-    print(snt)
-
     ordered_jobs = []
     current_params = []
     start_find = False
@@ -171,8 +169,12 @@ def getcontext(snt_raw):
                             add_to = len(current_params) - 1
                         if snt[index][0] == "plus":
                             current_params[add_to] += to_num(snt[index + 1][0])
+                            if to_num(snt[index + 1][0]) % 1 != 0:
+                                current_params[add_to] = roundCutOff(current_params[add_to])
                         else:
                             current_params[add_to] -= to_num(snt[index + 1][0])
+                            if to_num(snt[index + 1][0]) % 1 != 0:
+                                current_params[add_to] = roundCutOff(current_params[add_to])
                         skip_iter = True
                         continue
 

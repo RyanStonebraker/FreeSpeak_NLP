@@ -1,0 +1,3 @@
+Do not make an array with the values 3.10 * 0.55 + 0.3 and 4, 55 - 6 - 9 + 7 - 0.3, 7 through 11 by 2 and 
+then do make a matrix with them values 5-5,6.5, True, and 9. In addition to this, I want you to construct 
+me an elaborate matrix with the values "orange", 23+6,43,5,21, 7 and "BIG MULTI SENTENCE MOOSE".
