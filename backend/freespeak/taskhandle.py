@@ -185,7 +185,7 @@ def getcontext(snt_raw):
                     if snt[index - 1][1] == "PARAMETER" and snt[index + 1][1] == "NUMBER":
                         start = to_num(snt[index - 1][0])
                         end = to_num(snt[index + 1][0])
-                        if (snt[index + 2][0] == "by") and snt[index + 3][1] == "NUMBER":
+                        if (index + 2 < len(snt) and snt[index + 2][0] == "by") and snt[index + 3][1] == "NUMBER":
                             step = to_num(snt[index + 3][0])
                         [current_params.append(autoConvert(param)[0][0]) for param in through_mod(start, end, step)]
                         modForwardParams = True

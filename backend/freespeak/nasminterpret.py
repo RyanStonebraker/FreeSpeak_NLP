@@ -102,8 +102,8 @@ def instantiate_array(params, p_type, index=0):
         flag = "end"
         array_str += lbl + ":\n"
         for param in params:
-            array_str += "dq \"" + str(param) + "\"\n"
-        array_str += "dq 0\n"
+            array_str += "dd \"" + str(param) + "\"\n"
+        array_str += "dd 0\n"
     return (array_str, flag, lbl)
 
 
@@ -119,6 +119,7 @@ def nl_to_nasm(labeled):
     nasmcode = ""
     loaded_externs = add_section("text")
     data_section = ""
+    deconstruct = ""
     task_stack = []
     save_stack = []
     for sent in labeled:
@@ -147,8 +148,12 @@ def nl_to_nasm(labeled):
                     if len(data_section) == 0:
                         data_section += add_section("data")
                     data_section += auto_arr[0]
+        if exectask["TASK"] == "show":
+            if exectask["STRUCTURE"] == "deconstruction":
+                deconstruct = """<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""" + str(task_stack)
 
     for pop_task in reversed(save_stack):
         nasmcode += pop_task[0]
     nasmcode += "ret\n"
-    return loaded_externs + nasmcode + data_section
+
+    return loaded_externs + nasmcode + data_section + "\n" + deconstruct
