@@ -1,3 +1,4 @@
-deconstruct
+print
 make
+deconstruct
 show

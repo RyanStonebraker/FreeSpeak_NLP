@@ -21,16 +21,16 @@ def make_box(params):
     if math.ceil(len(paramstr) / colwidth) + 4 > rowheight:
         rowheight = math.ceil(len(paramstr) / colwidth) + 4
     for row in range(0, rowheight):
-        retstr += "\n"
+        retstr += "\\n"
         if row == 0 or row == rowheight - 1:
             retstr += "*" * colwidth
             continue
         if row == 1 or row == rowheight - 2:
-            retstr += "*" + " " * (colwidth - 2) + "*"
+            retstr += "*" + "~" * (colwidth - 2) + "*"
             continue
         if len(paramstr) > 0:
             segmnt = paramstr[:colwidth - 4]
-            retstr += "* " + segmnt + " " * (colwidth - len(segmnt) - 3) + "*"
+            retstr += "* " + segmnt + "~" * (colwidth - len(segmnt) - 3) + "*"
             paramstr = paramstr[colwidth - 4:]
     return retstr
 
@@ -64,14 +64,9 @@ def mov_bracket_op(*dest, src, stype="QWORD"):
     return mv_str + "\n"
 
 
-# def print_array(arr):
-#     iarray_print
-#     larray_print
-#     farray_print
-
-
-def instantiate_array(params, p_type, index=0):
+def instantiate_array(params, p_type, open_registers, index=0):
     array_str = ""
+    loc = "label"
     lbl = "arr_struct" + str(index)
     flag = "c_loc"
     if p_type == "integer":
@@ -80,6 +75,10 @@ def instantiate_array(params, p_type, index=0):
         array_str += "call malloc\n"
         for count, param in enumerate(params):
             array_str += mov_bracket_op("rax", count * p_size, src=param)
+        loc = "register"
+        lbl = open_registers[len(open_registers) - 1]
+        array_str += mov_op(lbl, "rax")
+        del open_registers[len(open_registers) - 1]
     elif p_type == "float":
         flag = "end"
         array_str += lbl + ":\n"
@@ -93,7 +92,7 @@ def instantiate_array(params, p_type, index=0):
         array_str += alloc_size_lea(len(params))
         array_str += "call malloc\n"
         for count, param in enumerate(params):
-            if param == "True" or taskhandle.to_num(param) >= 1:
+            if param == "True" or taskhandle.to_num(param) >= 1 or taskhandle.to_num(param) < 0:
                 swap_str = 1
             elif param == "False" or taskhandle.to_num(param) == 0:
                 swap_str = 0
@@ -102,9 +101,12 @@ def instantiate_array(params, p_type, index=0):
         flag = "end"
         array_str += lbl + ":\n"
         for param in params:
-            array_str += "dd \"" + str(param) + "\"\n"
-        array_str += "dd 0\n"
-    return (array_str, flag, lbl)
+            for index in range(0, math.ceil(len(param) / 40)-1):
+                array_str += "db `" + str(param)[:40] + "`\n"
+                param = param[40:]
+            array_str += "db `" + str(param)[:40] + "`, 0\n"
+
+    return (array_str, flag, [loc, lbl], open_registers)
 
 
 def add_section(sect):
@@ -122,6 +124,12 @@ def nl_to_nasm(labeled):
     deconstruct = ""
     task_stack = []
     save_stack = []
+
+    # (register|label, name)
+    storage_history = []
+    # open_registers = ["r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "rax", "rdi", "rcx", "rdx"]
+    open_registers = ["rax", "rdi", "rcx", "rdx", "r15", "r14", "r13", "r12", "r11", "r10", "r9", "r8"]
+
     for sent in labeled:
         if len(labeled) > 0:
             for tsk in sent:
@@ -135,7 +143,22 @@ def nl_to_nasm(labeled):
         # make == allocate space for some structure
         if exectask["TASK"] == "make":
             if exectask["STRUCTURE"] == "array":
-                auto_arr = instantiate_array(exectask["PARAMETERS"], exectask["TYPE"], index)
+                auto_arr = instantiate_array(exectask["PARAMETERS"], exectask["TYPE"], open_registers, index)
+                if auto_arr[1] == "c_loc":
+                    if "malloc" not in loaded_externs:
+                        loaded_externs += load_module("malloc")
+                    if "free" not in loaded_externs:
+                        loaded_externs += load_module("free")
+                    nasmcode += auto_arr[0]
+                    # nasmcode += "push rax\n"
+                    # save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
+                elif auto_arr[1] == "end":
+                    if len(data_section) == 0:
+                        data_section += add_section("data")
+                    data_section += auto_arr[0]
+                storage_history.append(auto_arr[2])
+            elif exectask["STRUCTURE"] == "box":
+                auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], exectask["TYPE"], open_registers, index)
                 if auto_arr[1] == "c_loc":
                     if "malloc" not in loaded_externs:
                         loaded_externs += load_module("malloc")
@@ -148,10 +171,12 @@ def nl_to_nasm(labeled):
                     if len(data_section) == 0:
                         data_section += add_section("data")
                     data_section += auto_arr[0]
+
         if exectask["TASK"] == "show":
             if exectask["STRUCTURE"] == "deconstruction":
                 deconstruct = """<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""" + str(task_stack)
 
+    print(storage_history)
     for pop_task in reversed(save_stack):
         nasmcode += pop_task[0]
     nasmcode += "ret\n"

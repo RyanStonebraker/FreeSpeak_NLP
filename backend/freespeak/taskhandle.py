@@ -154,6 +154,8 @@ def getcontext(snt_raw):
 
         if start_find:
             if snt[index][1] == "STRUCTURE":
+                if index - 1 > 0 and snt[index - 1][1] == "NUMBER":
+                    current_params.append(to_num(snt[index - 1][0]))
                 c_structure = snt[index][0]
                 continue
 

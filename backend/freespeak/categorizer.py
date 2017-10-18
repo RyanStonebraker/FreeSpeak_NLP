@@ -148,6 +148,9 @@ def _unloadCache():
             _outTYPE.write(line + "\n")
 
 
+checkNumEnd = re.compile(r"(\s[0-9]+)((?:rd|th|st))\s", re.IGNORECASE)
+
+
 def label(sentence):
     _loadCache()
 
@@ -160,6 +163,7 @@ def label(sentence):
     sentence = sentence.replace("*", " multiplied ")
     sentence = sentence.replace("/", " divided ")
     sentence = sentence.replace("  ", " ")
+    sentence = re.sub(checkNumEnd, r'\1 ', sentence)
 
     sentence = deconstruct(sentence)
 
