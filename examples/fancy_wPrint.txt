@@ -1,0 +1,5 @@
+Make an array of the values False, 0, True, 1, 0, then construct a matrix with the numbers 1 through 10 
+and the integer 4. Next, create an array of the values 3.42, 23.32, 344.23, 34 and 32. Finally, build me 
+an array with the values "Stringy String", 3.412331, "Really Long STRINGY string" and "Test". Show the 
+deconstruction. Make a box with the string "This is a test of the box functionality". Print this. Show 
+deconstruction.

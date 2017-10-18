@@ -65,14 +65,23 @@ def mov_bracket_op(*dest, src, stype="QWORD"):
 
 
 def instantiate_array(params, p_type, open_registers, index=0):
+    total_registers = ["rax", "rdi", "rcx", "rdx", "r15", "r14", "r13", "r12", "r11", "r10", "r9", "r8"]
+    busy_registers = []
+    for reg in total_registers:
+        if reg not in open_registers:
+            busy_registers.append(reg)
     array_str = ""
     loc = "label"
     lbl = "arr_struct" + str(index)
     flag = "c_loc"
     if p_type == "integer":
         p_size = 8
+        for reg in busy_registers:
+            array_str += "push " + reg + "\n"
         array_str += alloc_size_lea(len(params))
         array_str += "call malloc\n"
+        for reg in reversed(busy_registers):
+            array_str += "pop " + reg + "\n"
         for count, param in enumerate(params):
             array_str += mov_bracket_op("rax", count * p_size, src=param)
         loc = "register"
@@ -97,6 +106,9 @@ def instantiate_array(params, p_type, open_registers, index=0):
             elif param == "False" or taskhandle.to_num(param) == 0:
                 swap_str = 0
             array_str += mov_bracket_op("rax", count * p_size, src=swap_str)
+        loc = "register"
+        lbl = open_registers[len(open_registers) - 1]
+        array_str += mov_op(lbl, "rax")
     elif p_type == "string":
         flag = "end"
         array_str += lbl + ":\n"
@@ -106,7 +118,7 @@ def instantiate_array(params, p_type, open_registers, index=0):
                 param = param[40:]
             array_str += "db `" + str(param)[:40] + "`, 0\n"
 
-    return (array_str, flag, [loc, lbl], open_registers)
+    return (array_str, flag, [loc, lbl, "array", p_type], open_registers)
 
 
 def add_section(sect):
@@ -127,7 +139,6 @@ def nl_to_nasm(labeled):
 
     # (register|label, name)
     storage_history = []
-    # open_registers = ["r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "rax", "rdi", "rcx", "rdx"]
     open_registers = ["rax", "rdi", "rcx", "rdx", "r15", "r14", "r13", "r12", "r11", "r10", "r9", "r8"]
 
     for sent in labeled:
@@ -165,18 +176,72 @@ def nl_to_nasm(labeled):
                     if "free" not in loaded_externs:
                         loaded_externs += load_module("free")
                     nasmcode += auto_arr[0]
-                    nasmcode += "push rax\n"
-                    save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
+                    # nasmcode += "push rax\n"
+                    # save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
                 elif auto_arr[1] == "end":
                     if len(data_section) == 0:
                         data_section += add_section("data")
                     data_section += auto_arr[0]
+                storage_history.append([auto_arr[2][0], auto_arr[2][1], "box", "string"])
 
-        if exectask["TASK"] == "show":
+        elif exectask["TASK"] == "print":
+            loaded_externs += load_module("printf")
+            source = []
+            p_count = 0
+            p_struct = exectask["STRUCTURE"]
+            try:
+                sourceNum = taskhandle.to_num(exectask["PARAMETERS"][0])
+            except:
+                sourceNum = 0
+            if str(p_struct) == "this":
+                source = storage_history[len(storage_history) - 1]
+            else:
+                for struct_info in storage_history:
+                    if sourceNum == p_count and str(struct_info[2]) == str(p_struct):
+                        source = struct_info
+                    p_count += 1
+
+            if len(source) > 3 and source[3] == "string":
+                nmlbl = str(p_struct) + str(p_count) + "str"
+                data_section += nmlbl + ":\n"
+                data_section += "db '%s', 0"
+                nasmcode += "push rdi\npush rsi\n"
+                nasmcode += "mov rdi, " + nmlbl + "\n"
+                nasmcode += "mov rsi, " + source[1] + "\n"
+                nasmcode += "mov al, 0\n"
+                for store in storage_history:
+                    if store[0] == "register":
+                        nasmcode += "push " + store[1] + "\n"
+                nasmcode += "call printf\n"
+                for store in reversed(storage_history):
+                    if store[0] == "register":
+                        nasmcode += "pop " + store[1] + "\n"
+                nasmcode += "pop rsi\npop rdi\n"
+
+            # print(source)
+
+
+        elif exectask["TASK"] == "show":
             if exectask["STRUCTURE"] == "deconstruction":
                 deconstruct = """<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""" + str(task_stack)
+    # print(storage_history)
 
-    print(storage_history)
+    for index, dealloc in enumerate(reversed(storage_history)):
+        if dealloc[0] == "register":
+            if index < len(storage_history) - 1:
+                for store in storage_history:
+                    if store[0] == "register":
+                        nasmcode += "push " + store[1] + "\n"
+                nasmcode += "mov rdi, " + str(dealloc[1]) + "\n"
+                nasmcode += "call free\n"
+                for store in reversed(storage_history):
+                    if store[0] == "register":
+                        nasmcode += "pop " + store[1] + "\n"
+                storage_history.pop(len(storage_history) - index)
+            else:
+                nasmcode += "mov rdi, " + str(dealloc[1]) + "\n"
+                nasmcode += "call free\n"
+
     for pop_task in reversed(save_stack):
         nasmcode += pop_task[0]
     nasmcode += "ret\n"

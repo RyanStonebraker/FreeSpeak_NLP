@@ -13,7 +13,7 @@ from freespeak import freespeak
 from freespeak import nasminterpret
 
 # TURN OFF FOR FINAL *******************************************************
-cgitb.enable()
+# cgitb.enable()
 
 form = cgi.FieldStorage()
 

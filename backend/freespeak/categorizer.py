@@ -163,7 +163,7 @@ def label(sentence):
     sentence = sentence.replace("*", " multiplied ")
     sentence = sentence.replace("/", " divided ")
     sentence = sentence.replace("  ", " ")
-    sentence = re.sub(checkNumEnd, r'\1 ', sentence)
+    sentence = re.sub(checkNumEnd, r'\1-1 ', sentence)
 
     sentence = deconstruct(sentence)
 
