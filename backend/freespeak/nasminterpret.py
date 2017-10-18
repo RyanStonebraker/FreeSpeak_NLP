@@ -187,7 +187,7 @@ def nl_to_nasm(labeled):
         elif exectask["TASK"] == "print":
             loaded_externs += load_module("printf")
             source = []
-            p_count = 0
+            p_count = 1
             p_struct = exectask["STRUCTURE"]
             try:
                 sourceNum = taskhandle.to_num(exectask["PARAMETERS"][0])
