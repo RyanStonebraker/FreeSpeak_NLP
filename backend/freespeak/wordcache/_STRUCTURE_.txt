@@ -1,5 +1,5 @@
 this
-output
 box
-array
 deconstruction
+output
+array

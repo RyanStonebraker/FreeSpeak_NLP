@@ -125,9 +125,6 @@ def add_section(sect):
     return "<p style = \"text-align: left; margin-bottom: 0; margin-left: 10%;\">section ." + str(sect) + "</p>\n"
 
 
-# TODO: go through task stack and perform assembly tasks, implement statements
-# like "print this array.", "print the 2nd array.", etc. and "exclude 3,4,5 from 2nd array."
-# (exclude is a task)
 def nl_to_nasm(labeled):
     """NASM Assembly language pack for Freespeak NLP Engine."""
     nasmcode = ""
@@ -145,10 +142,6 @@ def nl_to_nasm(labeled):
         if len(labeled) > 0:
             for tsk in sent:
                 task_stack.append(tsk)
-    # return str(task_stack)
-
-# TODO: Write a function that writes assembly that realloc (variant of malloc) an array
-# to store pointers to data structures so I can call functions
 
     for index, exectask in enumerate(task_stack):
         # make == allocate space for some structure
@@ -161,8 +154,6 @@ def nl_to_nasm(labeled):
                     if "free" not in loaded_externs:
                         loaded_externs += load_module("free")
                     nasmcode += auto_arr[0]
-                    # nasmcode += "push rax\n"
-                    # save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
                 elif auto_arr[1] == "end":
                     if len(data_section) == 0:
                         data_section += add_section("data")
@@ -176,8 +167,6 @@ def nl_to_nasm(labeled):
                     if "free" not in loaded_externs:
                         loaded_externs += load_module("free")
                     nasmcode += auto_arr[0]
-                    # nasmcode += "push rax\n"
-                    # save_stack.append(("pop rdi\ncall free\n", exectask["STRUCTURE"]))
                 elif auto_arr[1] == "end":
                     if len(data_section) == 0:
                         data_section += add_section("data")
@@ -218,13 +207,9 @@ def nl_to_nasm(labeled):
                         nasmcode += "pop " + store[1] + "\n"
                 nasmcode += "pop rsi\npop rdi\n"
 
-            # print(source)
-
-
         elif exectask["TASK"] == "show":
             if exectask["STRUCTURE"] == "deconstruction":
                 deconstruct = """<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""" + str(task_stack)
-    # print(storage_history)
 
     for index, dealloc in enumerate(reversed(storage_history)):
         if dealloc[0] == "register":
@@ -237,7 +222,7 @@ def nl_to_nasm(labeled):
                 for store in reversed(storage_history):
                     if store[0] == "register":
                         nasmcode += "pop " + store[1] + "\n"
-                storage_history.pop(len(storage_history) - index)
+                storage_history.pop(len(storage_history) - 1 - index)
             else:
                 nasmcode += "mov rdi, " + str(dealloc[1]) + "\n"
                 nasmcode += "call free\n"

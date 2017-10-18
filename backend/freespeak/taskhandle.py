@@ -81,9 +81,7 @@ def autoConvert(params):
 
 
 def getcontext(snt_raw):
-    # print(snt_raw)
     snt = [wrd for wrd in snt_raw if wrd[0] != '' and wrd[1] != "SUPERFLUOUS"]
-    # print(snt)
 
     # PRE-MAIN PROCESSING LOOP (HANDLES PEMDAS)
     for index, word in enumerate(snt):
