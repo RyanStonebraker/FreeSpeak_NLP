@@ -1,7 +1,39 @@
 # FreeSpeak Natural Language Interpreter
 Raw English language that is interpreted to NASM Assembly using Python CGI with minimal external library usage and with intelligent task handling that has the ability the find whether an unknown word is a synonym for a known element.
-
 ___
+
+#### Example Usages:
+* ***"Build a box with the text "This is a box.". Then, print this box."***
+
+* ***"Construct an array with the values "cat", "dog", 3.10 * 0.55 + 0.3, 5, 1 through 5 incrementing by 1."***
+
+* ***"Create a matrix of booleans with 1.2, True, False, 0, 1, and 2 - 5."***
+
+* ***"Make an array of values with "cat", "dog", "monkey", 123, 1.23, True, then create another array of strings with the values "cat", "big dog", 1 through 3 incrementing by 0.5. Finally, construct another array of values "test", "testing test test", and 1.2345. Print the 2nd array."***
+
+#### Installation:
+Configure a simple apache server on the OS of your choice, clone this repo and make the "docs" folder your DocumentRoot, cd into the "backend" folder and run the (linux) commands or their equivalent:
+```
+chmod g+rw wordcache
+chmod g+rw wordcache/*
+chgrp www-data wordcache
+chgrp www-data wordcache/*
+```
+Next, get the apache server to accept Python CGI by including the following in the same config file that DocumentRoot was changed in:
+```
+<Directory "/var/www/html/FreeSpeak_NLP/cgi-bin">
+        Options ExecCGI
+        SetHandler cgi-script
+</Directory>
+
+<Directory "/var/www/html">
+        Options +ExecCGI
+        AddHandler cgi-script .py
+</Directory>
+```
+Then simply start the apache server and go to localhost:8080 or whichever port was configured in the main/virtualhost config file.
+
+
 #### Current Features:
 * Fully functional frontend
 * Python CGI handles all queries
@@ -19,8 +51,10 @@ ___
 
 ___
 #### In Development:
+* Better input sanitization
+* Better context error handling
 * More sophisticated print function
-* Inner-array accessor functions 
+* Inner-array accessor functions
 * Stand alone (non-array) values
 * Ability to perform non pre-optimized mathematical operations that are shown in NASM.
 * More external view controls (Make font bigger, show output, Copy everything to clipboard, etc.)
@@ -28,6 +62,12 @@ ___
   * conditional statements
   * loops
   * A(n) [OBJECT] is ... style function declarations
+
+#### Reach/Future Goals:
+* Code rewrite as a Flask app instead of messy Python CGI
+* Speech to text
+* Complete code refactoring to utilize a supervised machine learning algorithm, possibly with TensorFlow
+* Ability to pass the so-called Turing test for esoteric languages
 
 ___
    **http://www.freespeak.network**

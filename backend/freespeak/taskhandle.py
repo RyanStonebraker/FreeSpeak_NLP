@@ -2,16 +2,17 @@ import numpy
 import collections
 # import pdb
 
-# IDEA: Return a class containing the "stack" order of task execution, current "this" keyword reference,
-# various flags for output, etc.
 
-
+# a function that returns the "purpose" of each command, this was made modular
+# just in case it was decided more information was needed
 def structure_output(task="", structure="", params=[], paramtype=""):
     if task == "":
         return
     return {"TASK": task, "STRUCTURE": structure, "PARAMETERS": params, "TYPE": paramtype}
 
 
+# tries to cast a string to an integer and if fails, then casts to a float and
+# if THAT fails, then it gives up
 def to_num(strNum):
     try:
         return int(strNum)
@@ -22,6 +23,8 @@ def to_num(strNum):
             raise ValueError("to_num parameter not a number!")
 
 
+# The definition of pythonic programming... if to_num doesn't throw, then
+# that is returned, else whatever was passed is just returned unaffected
 def maybe_num(param):
     try:
         return to_num(param)
@@ -29,14 +32,19 @@ def maybe_num(param):
         return param
 
 
+# necessary to implement a sort of lazy rounding function in python
 def roundCutOff(num):
     return ('%f' % num).rstrip('0').rstrip('.')
 
 
+# rounds the numbers returned between begin and end incrementing by inc
+# uses maybe_num just to make extra sure this doesn't throw
 def through_mod(begin, end, inc=1):
-    return [maybe_num(('%f' % num).rstrip('0').rstrip('.')) for num in numpy.arange(begin + inc, end + inc, inc)]
+    strthrough = [roundCutOff(num) for num in numpy.arange(begin + inc, end + inc, inc)]
+    return [maybe_num(num) for num in strthrough]
 
 
+# converts any word to a specified ctype
 def convertParam(param, ctype):
     if ctype == "integer":
         try:
@@ -53,6 +61,7 @@ def convertParam(param, ctype):
         return param
 
 
+# converts a list of params to a ctype canonically using convertParam
 def convertParams(params, ctype):
     new_params = []
     for param in params:
@@ -60,6 +69,8 @@ def convertParams(params, ctype):
     return new_params
 
 
+# checks type of each word in list and converts every word in list to whatever
+# word has the highest type precedence
 def autoConvert(params):
     auto_type = "string"
     if not isinstance(params, collections.Iterable):
@@ -80,6 +91,9 @@ def autoConvert(params):
     return (convertParams(params, auto_type), auto_type)
 
 
+# Massive function that attempts to understand what is being asked in each
+# sentence. It handles multiple commands in a single sentence by "flushing"
+# previous context when a new task word is read.
 def getcontext(snt_raw):
     snt = [wrd for wrd in snt_raw if wrd[0] != '' and wrd[1] != "SUPERFLUOUS"]
 
@@ -139,6 +153,8 @@ def getcontext(snt_raw):
             modForwardParams = False
             continue
 
+        # If not already in a task, starts a context search based on current
+        # task word
         if snt[index][1] == "TASK" and not start_find:
             if ignore_next:
                 ignore_next = False
@@ -147,9 +163,11 @@ def getcontext(snt_raw):
             c_task = snt[index][0]
             continue
 
+        # resets the mathematical optimization flag
         if snt[index][0] != "plus" and snt[index][0] != "minus":
             add_to = -1
 
+        # If a task was found, then start looking for context
         if start_find:
             if snt[index][1] == "STRUCTURE":
                 if index - 1 > 0 and snt[index - 1][1] == "NUMBER":

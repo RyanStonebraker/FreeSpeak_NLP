@@ -21,6 +21,9 @@ type_ = []
 superfluous_ = []
 
 
+# stores all wordcache files into memory so they can be referenced
+# the idea behind this was to optimize tasks server side so that the more
+# data was enterred, the quicker parts of speech could be identified.
 def _loadCache():
     BASE_DIR = os.path.dirname(os.path.realpath(__file__))
     CACHE_DIR = BASE_DIR + "/wordcache/"
@@ -62,13 +65,14 @@ def _loadCache():
                 _SUPERFLUOUS.append(line)
 
 
+# simple regex function that splits based on spaces, but preserves things in
+# quotations
 def deconstruct(snt):
     snt = snt.lower()
     pattern = re.compile(r'''((?:[^ "]|"[^"]*")+)''')
-
     return [wrd for wrd in pattern.split(snt) if wrd != "" and wrd != " "]
 
-
+# casts a word as an int or float, and if it fails, then its not a number.
 def checkNum(str_num):
     if str_num.isnumeric():
         return True
@@ -83,16 +87,21 @@ def checkNum(str_num):
 
 # Can't return re.match because it returns object, but python if statements
 # can check "truthness" of a statement (not a bool)
+# -checks to see whether string is quoted
 def checkString(poss_str):
     if re.match(r'^\"(.)+\"$', poss_str):
         return True
     return False
 
 
+# Returns whether string is a boolean true or false and then includes
+# what the string would evaluate to as a boolean
 def checkBool(poss_str):
     return((poss_str == "true" or poss_str == "false"), poss_str == "true")
 
 
+# does some minor string scrubbing and then checks to see if word is already
+# cached, if not it gets sent off to the synonym finder to see if it should be
 def matchword(wrd):
     lbl = ""
     wrd = wrd.strip(",'[]\{\}\\/|")
@@ -124,6 +133,7 @@ def matchword(wrd):
     return (wrd, lbl)
 
 
+# Writes out all changes to the cache as a set so there are no repeated values
 def _unloadCache():
     BASE_DIR = os.path.dirname(os.path.realpath(__file__))
     CACHE_DIR = BASE_DIR + "/wordcache/"
@@ -148,9 +158,13 @@ def _unloadCache():
             _outTYPE.write(line + "\n")
 
 
+# compiles a regex expression converting 1st, 2nd, 3rd, 4th, 5th,... to numbers
+# technically this would strip 11nd or 50rd as well, but english is messy..
 checkNumEnd = re.compile(r"(\s[0-9]+)((?:rd|th|st|nd))\s", re.IGNORECASE)
 
 
+# replaces conjunction words with spaces and symbols to words and returns a
+# copy of the original sentence passed paired with each word's labels
 def label(sentence):
     _loadCache()
 

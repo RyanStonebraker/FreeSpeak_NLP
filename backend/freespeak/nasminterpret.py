@@ -4,6 +4,8 @@ from freespeak import taskhandle
 import math
 
 
+# Made this a function just in case the structure externs are stored changes
+# in the future
 def load_module(modul):
     return "extern " + str(modul) + "\n"
 
@@ -49,6 +51,7 @@ def lea_op(*params, reg="rdi", stype="QWORD"):
     return op_str + "\n"
 
 
+# mov opcode
 def mov_op(dest, src, stype=" "):
     if stype != " ":
         dest += " "
@@ -56,6 +59,7 @@ def mov_op(dest, src, stype=" "):
     return "mov " + dest + "," + stype + src + "\n"
 
 
+# specialized mov opcode that formats with brackets and a type
 def mov_bracket_op(*dest, src, stype="QWORD"):
     mv_str = "mov " + stype + "[" + str(dest[0])
     for d_add in dest[1:]:
@@ -64,6 +68,8 @@ def mov_bracket_op(*dest, src, stype="QWORD"):
     return mv_str + "\n"
 
 
+# handles arrays of any type and utilizes open registers if needed or malloc
+# in the case of integer arrays
 def instantiate_array(params, p_type, open_registers, index=0):
     total_registers = ["rax", "rdi", "rcx", "rdx", "r15", "r14", "r13", "r12", "r11", "r10", "r9", "r8"]
     busy_registers = []
@@ -121,10 +127,13 @@ def instantiate_array(params, p_type, open_registers, index=0):
     return (array_str, flag, [loc, lbl, "array", p_type], open_registers)
 
 
+# Takes advantage of the fact that python is simply injecting text that is
+# later interpreted as HTML. Also is used to more easily identify NASM sections
 def add_section(sect):
     return "<p style = \"text-align: left; margin-bottom: 0; margin-left: 10%;\">section ." + str(sect) + "</p>\n"
 
 
+# Takes the simplified commands and converts to NASM
 def nl_to_nasm(labeled):
     """NASM Assembly language pack for Freespeak NLP Engine."""
     nasmcode = ""
@@ -144,8 +153,10 @@ def nl_to_nasm(labeled):
                 task_stack.append(tsk)
 
     for index, exectask in enumerate(task_stack):
+
         # make == allocate space for some structure
         if exectask["TASK"] == "make":
+
             if exectask["STRUCTURE"] == "array":
                 auto_arr = instantiate_array(exectask["PARAMETERS"], exectask["TYPE"], open_registers, index)
                 if auto_arr[1] == "c_loc":
@@ -159,6 +170,7 @@ def nl_to_nasm(labeled):
                         data_section += add_section("data")
                     data_section += auto_arr[0]
                 storage_history.append(auto_arr[2])
+
             elif exectask["STRUCTURE"] == "box":
                 auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], exectask["TYPE"], open_registers, index)
                 if auto_arr[1] == "c_loc":
