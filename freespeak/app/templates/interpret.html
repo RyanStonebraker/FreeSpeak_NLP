@@ -1,0 +1,17 @@
+{% extends "base_template.html" %}
+{% block title %}FreeSpeak | Interpret{% endblock %}
+{% block body %}
+<section class="output"><h4>NASM INTERPRETATION:</h4><div class="line-sep"></div>
+  {% for line in content %}
+    <p
+    {% if line=="section .text" or line=="section .data"%}
+      style = "text-align: left; margin-bottom: 0; margin-left: 10%;"
+    {% endif %}
+    >{{line}}</p>
+  {% endfor %}
+</section>
+
+<script type="text/javascript">
+  $("textarea").focus().val("").val("{{raw_text}}");
+</script>
+{% endblock %}

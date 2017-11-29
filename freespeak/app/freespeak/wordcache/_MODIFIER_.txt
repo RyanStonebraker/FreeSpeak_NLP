@@ -1,0 +1,12 @@
+of
+with
+through
+plus
+by
+minus
+divided
+include
+multiplied
+without
+exclude
+not

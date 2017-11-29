@@ -1,0 +1,35 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="Ryan Stonebraker">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href = "../static/img/favicon.png" type = "png">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous">
+    </script>
+  </head>
+
+  <body>
+    <header>
+      <h1>Free Speak</h1>
+      <h2>Natural language interpreted down to NASM Assembly.</h2>
+    </header>
+    <section class="center-div">
+      <form class="nlArea" action="/interpret" method="post">
+        <textarea name="nlcode" id  = "sCde" onfocus="this.value = this.value;" autofocus placeholder="Start Typing Here..."></textarea>
+        <input type="submit" onfocus="this.value = this.value;" name="intrnl" value="Interpret">
+      </form>
+    </section>
+
+    {% block body %} {% endblock %}
+
+    <footer><h3>Ryan Stonebraker &copy; 2017</h3></footer>
+  </body>
+
+</html>
