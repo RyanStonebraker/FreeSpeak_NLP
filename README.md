@@ -2,53 +2,16 @@
 Minimally structured English language that is interpreted to x86 syntax assembly. Code refactored to a Python Flask application and live version hosted on nginx using uwsgi.
 ___
 
-#### Example Usages:
-* ***"Build a box with the text "This is a box.". Then, print this box."***
-
-* ***"Construct an array with the values "cat", "dog", 3.10 * 0.55 + 0.3, 5, 1 through 5 incrementing by 1."***
-
-* ***"Create a matrix of booleans with 1.2, True, False, 0, 1, and 2 - 5."***
-
-* ***"Make an array of values with "cat", "dog", "monkey", 123, 1.23, True, then create another array of strings with the values "cat", "big dog", 1 through 3 incrementing by 0.5. Finally, construct another array of values "test", "testing test test", and 1.2345. Print the 2nd array."***
-
-#### Installation:
-##### Python Flask Implementation:
-make sure you have python3 and install the following dependencies using pip:
-```
-pip3 install flask numpy
-```
-Now clone the repository and navigate to *FreeSpeak_NLP/freespeak* in a terminal window. From this directory, type the following commands to configure the Flask App: 
-```
-export FLASK_APP=run.py
-```
-Finally, just type:
-```
-flask run
-```
-and the flask application should start running on localhost port 5000.
-
-##### Python CGI Implementation (deprecated):
-Configure a simple apache server on the OS of your choice, clone this repo and make the "docs" folder your DocumentRoot, cd into the "backend" folder and run the (linux) commands or their equivalent:
-```
-chmod g+rw wordcache
-chmod g+rw wordcache/*
-chgrp www-data wordcache
-chgrp www-data wordcache/*
-```
-Next, get the apache server to accept Python CGI by including the following in the same config file that DocumentRoot was changed in:
-```
-<Directory "/var/www/html/FreeSpeak_NLP/cgi-bin">
-        Options ExecCGI
-        SetHandler cgi-script
-</Directory>
-
-<Directory "/var/www/html">
-        Options +ExecCGI
-        AddHandler cgi-script .py
-</Directory>
-```
-Then simply start the apache server and go to localhost:8080 or whichever port was configured in the main/virtualhost config file.
-
+### Change Log:
+####    11/29
+* HTTPS certificate signed by LetsEncrypt
+* Firewalls configured on Live Server
+* Secure html escaped strings sent to freespeak engine
+* Jinja templating engine used for dynamic page generation instead of Python constantly returning raw HTML
+* Default POST requests instead of GET with plain text query strings
+* Application served with uwsgi
+* Switched from Apache to Nginx web server
+* Ported to Python Flask micro-framework from raw Python CGI
 
 #### Current Features:
 * Fully functional frontend
@@ -84,5 +47,52 @@ ___
 * Complete code refactoring to utilize a supervised machine learning algorithm, possibly with TensorFlow
 * Ability to pass the so-called Turing test for esoteric languages
 
+#### Example Usages:
+* ***"Build a box with the text "This is a box.". Then, print this box."***
+
+* ***"Construct an array with the values "cat", "dog", 3.10 * 0.55 + 0.3, 5, 1 through 5 incrementing by 1."***
+
+* ***"Create a matrix of booleans with 1.2, True, False, 0, 1, and 2 - 5."***
+
+* ***"Make an array of values with "cat", "dog", "monkey", 123, 1.23, True, then create another array of strings with the values "cat", "big dog", 1 through 3 incrementing by 0.5. Finally, construct another array of values "test", "testing test test", and 1.2345. Print the 2nd array."***
+
+#### Installation:
+##### Python Flask Implementation:
+make sure you have python3 and install the following dependencies using pip:
+```
+pip3 install flask numpy
+```
+Now clone the repository and navigate to *FreeSpeak_NLP/freespeak* in a terminal window. From this directory, type the following commands to configure the Flask App:
+```
+export FLASK_APP=run.py
+```
+Finally, just type:
+```
+flask run
+```
+and the flask application should start running on localhost port 5000.
+
+##### Python CGI Implementation (deprecated):
+Configure a simple apache server on the OS of your choice, clone this repo and make the "docs" folder your DocumentRoot, cd into the "backend" folder and run the (linux) commands or their equivalent:
+```
+chmod g+rw wordcache
+chmod g+rw wordcache/*
+chgrp www-data wordcache
+chgrp www-data wordcache/*
+```
+Next, get the apache server to accept Python CGI by including the following in the same config file that DocumentRoot was changed in:
+```
+<Directory "/var/www/html/FreeSpeak_NLP/cgi-bin">
+        Options ExecCGI
+        SetHandler cgi-script
+</Directory>
+
+<Directory "/var/www/html">
+        Options +ExecCGI
+        AddHandler cgi-script .py
+</Directory>
+```
+Then simply start the apache server and go to localhost:8080 or whichever port was configured in the main/virtualhost config file.
+
 ___
-   **http://www.freespeak.network (http://45.55.89.112/)**
+   **https://www.freespeak.network (http://45.55.89.112/)**
