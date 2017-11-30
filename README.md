@@ -1,5 +1,5 @@
 # FreeSpeak Natural Language Interpreter
-Raw English language that is interpreted to NASM Assembly using Python CGI with minimal external library usage and with intelligent task handling that has the ability the find whether an unknown word is a synonym for a known element.
+Minimally structured English language that is interpreted to x86 syntax assembly. Code refactored to a Python Flask application and live version hosted on nginx using uwsgi.
 ___
 
 #### Example Usages:
@@ -12,6 +12,22 @@ ___
 * ***"Make an array of values with "cat", "dog", "monkey", 123, 1.23, True, then create another array of strings with the values "cat", "big dog", 1 through 3 incrementing by 0.5. Finally, construct another array of values "test", "testing test test", and 1.2345. Print the 2nd array."***
 
 #### Installation:
+##### Python Flask Implementation:
+make sure you have python3 and install the following dependencies using pip:
+```
+pip3 install flask numpy
+```
+Now clone the repository and navigate to *FreeSpeak_NLP/freespeak* in a terminal window. From this directory, type the following commands to configure the Flask App: 
+```
+export FLASK_APP=run.py
+```
+Finally, just type:
+```
+flask run
+```
+and the flask application should start running on localhost port 5000.
+
+##### Python CGI Implementation (deprecated):
 Configure a simple apache server on the OS of your choice, clone this repo and make the "docs" folder your DocumentRoot, cd into the "backend" folder and run the (linux) commands or their equivalent:
 ```
 chmod g+rw wordcache
@@ -36,7 +52,8 @@ Then simply start the apache server and go to localhost:8080 or whichever port w
 
 #### Current Features:
 * Fully functional frontend
-* Python CGI handles all queries
+* ~~Python CGI handles all queries~~
+* ###### Refactored Flask Application
 * Optimized addition, subtraction, multiplication and division that can evaluate before being sent to the NASM interpreter
 * Dynamically sized arrays
 * Type can either be directly specified, or if it is left off, the highest precedented type is assumed for all items in an array.
@@ -51,12 +68,11 @@ Then simply start the apache server and go to localhost:8080 or whichever port w
 
 ___
 #### In Development:
-* Better input sanitization
 * Better context error handling
 * More sophisticated print function
 * Inner-array accessor functions
 * Stand alone (non-array) values
-* Ability to perform non pre-optimized mathematical operations that are shown in NASM.
+* Ability to perform non pre-optimized mathematical operations that are shown in outputted assembly.
 * More external view controls (Make font bigger, show output, Copy everything to clipboard, etc.)
 * Adding support for:
   * conditional statements
@@ -64,10 +80,9 @@ ___
   * A(n) [OBJECT] is ... style function declarations
 
 #### Reach/Future Goals:
-* Code rewrite as a Flask app instead of messy Python CGI
 * Speech to text
 * Complete code refactoring to utilize a supervised machine learning algorithm, possibly with TensorFlow
 * Ability to pass the so-called Turing test for esoteric languages
 
 ___
-   **http://www.freespeak.network**
+   **http://www.freespeak.network (http://45.55.89.112/)**
