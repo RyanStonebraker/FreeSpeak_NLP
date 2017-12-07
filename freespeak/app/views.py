@@ -3,6 +3,7 @@
 from flask import render_template
 from flask import request
 from flask import redirect
+from flask import Markup
 from app import app
 
 import sys
@@ -12,7 +13,6 @@ sys.path.append(currDIR + "/freespeak/")
 
 import freespeak
 import nasminterpret
-
 
 @app.route("/")
 def index():
@@ -29,4 +29,4 @@ def interpret():
             return render_template("index.html")
         identified_lang = freespeak.identify(natural_lang)
         identified_lang = nasminterpret.nl_to_nasm(identified_lang).split("\n")
-        return render_template("interpret.html", content=identified_lang, raw_text=natural_lang)
+        return render_template("interpret.html", content=identified_lang, raw_text=natural_lang.replace('"', '\\"').replace("'", "\\'"))

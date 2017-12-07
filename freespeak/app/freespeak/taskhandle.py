@@ -20,7 +20,7 @@ def to_num(strNum):
         try:
             return float(strNum)
         except:
-            raise ValueError("to_num parameter not a number!")
+            raise ValueError("to_num parameter:" + str(strNum) + " not a number!")
 
 
 # The definition of pythonic programming... if to_num doesn't throw, then
@@ -100,11 +100,16 @@ def getcontext(snt_raw):
     # PRE-MAIN PROCESSING LOOP (HANDLES PEMDAS)
     for index, word in enumerate(snt):
         if snt[index][1] == "MODIFIER":
-            if snt[index][0] == "multiplied" and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
-                snt[index - 1] = (str(roundCutOff(to_num(snt[index - 1][0]) * to_num(snt[index + 1][0]))), "NUMBER")
-                del snt[index]
-                del snt[index]
-            elif snt[index][0] == "divided" and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
+            if snt[index][0] == "multiplied":
+                if len(snt) > index + 1 and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
+                    snt[index - 1] = (str(roundCutOff(to_num(snt[index - 1][0]) * to_num(snt[index + 1][0]))), "NUMBER")
+                    del snt[index]
+                    del snt[index]
+                elif len(snt) > 0 and snt[index - 1][1] == "NUMBER":
+                    snt[index] = snt[index - 1]
+                    snt[index - 1] = ("with", "MODIFIER")
+
+            elif snt[index][0] == "divided" and len(snt) > index + 1 and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
                 # print("<script>console.log(" + str(((to_num(snt[index - 1][0]) / to_num(snt[index + 1][0])), "NUMBER")[) + ")</script>")
                 snt[index - 1] = (str(roundCutOff(to_num(snt[index - 1][0]) / to_num(snt[index + 1][0]))), "NUMBER")
                 del snt[index]

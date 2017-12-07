@@ -34,7 +34,7 @@ def make_box(params):
             segmnt = paramstr[:colwidth - 4]
             retstr += "* " + segmnt + "~" * (colwidth - len(segmnt) - 3) + "*"
             paramstr = paramstr[colwidth - 4:]
-    return retstr
+    return retstr + "\\n"
 
 
 def alloc_size_lea(paramlen, size="8", reg="rdi"):
@@ -152,11 +152,12 @@ def nl_to_nasm(labeled):
             for tsk in sent:
                 task_stack.append(tsk)
 
+    loaded_externs = str(task_stack) + "\n" + loaded_externs
+
     for index, exectask in enumerate(task_stack):
 
         # make == allocate space for some structure
         if exectask["TASK"] == "make":
-
             if exectask["STRUCTURE"] == "array":
                 auto_arr = instantiate_array(exectask["PARAMETERS"], exectask["TYPE"], open_registers, index)
                 if auto_arr[1] == "c_loc":
@@ -172,7 +173,7 @@ def nl_to_nasm(labeled):
                 storage_history.append(auto_arr[2])
 
             elif exectask["STRUCTURE"] == "box":
-                auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], exectask["TYPE"], open_registers, index)
+                auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], "string", open_registers, index)
                 if auto_arr[1] == "c_loc":
                     if "malloc" not in loaded_externs:
                         loaded_externs += load_module("malloc")
@@ -186,7 +187,8 @@ def nl_to_nasm(labeled):
                 storage_history.append([auto_arr[2][0], auto_arr[2][1], "box", "string"])
 
         elif exectask["TASK"] == "print":
-            loaded_externs += load_module("printf")
+            if load_module("printf") not in loaded_externs:
+                loaded_externs += load_module("printf")
             source = []
             p_count = 1
             p_struct = exectask["STRUCTURE"]
@@ -203,9 +205,9 @@ def nl_to_nasm(labeled):
                     p_count += 1
 
             if len(source) > 3 and source[3] == "string":
-                nmlbl = str(p_struct) + str(p_count) + "str"
+                nmlbl = str(p_struct) + str(p_count) + str(index) + "str"
                 data_section += nmlbl + ":\n"
-                data_section += "db '%s', 0"
+                data_section += "db '%s', 0\n"
                 nasmcode += "push rdi\npush rsi\n"
                 nasmcode += "mov rdi, " + nmlbl + "\n"
                 nasmcode += "mov rsi, " + source[1] + "\n"
@@ -222,6 +224,14 @@ def nl_to_nasm(labeled):
         elif exectask["TASK"] == "show":
             if exectask["STRUCTURE"] == "deconstruction":
                 deconstruct = """<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""" + str(task_stack)
+        elif exectask["TASK"] == "repeat":
+            try:
+                repeat_amount = taskhandle.to_num(exectask["PARAMETERS"][0])
+            except:
+                repeat_amount = 1
+            if exectask["STRUCTURE"] == "this":
+                for i in range(0, repeat_amount):
+                    task_stack.insert(index + 1, task_stack[index - 1])
 
     for index, dealloc in enumerate(reversed(storage_history)):
         if dealloc[0] == "register":

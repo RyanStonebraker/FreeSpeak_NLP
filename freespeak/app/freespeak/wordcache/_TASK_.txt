@@ -1,4 +1,5 @@
-make
 print
-deconstruct
 show
+deconstruct
+make
+repeat

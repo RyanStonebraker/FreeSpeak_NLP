@@ -72,6 +72,7 @@ def deconstruct(snt):
     pattern = re.compile(r'''((?:[^ "]|"[^"]*")+)''')
     return [wrd for wrd in pattern.split(snt) if wrd != "" and wrd != " "]
 
+
 # casts a word as an int or float, and if it fails, then its not a number.
 def checkNum(str_num):
     if str_num.isnumeric():
@@ -185,4 +186,5 @@ def label(sentence):
 
     _unloadCache()
 
+    print (sentence)
     return taskhandle.getcontext(sentence)
