@@ -1,6 +1,8 @@
-repeat
-deconstruct
-show
-store
-make
 print
+repeat
+show
+subtract
+store
+add
+deconstruct
+make

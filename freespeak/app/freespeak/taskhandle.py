@@ -180,8 +180,9 @@ def getcontext(snt_raw, variables):
 
         # If a task was found, then start looking for context
         if start_find:
-            if c_task == "store":
+            if c_task == "store" or c_task == "add" or c_task == "subtract":
                 modForwardParams = True
+
             if snt[index][1] == "STRUCTURE":
                 if index - 1 > 0 and snt[index - 1][1] == "NUMBER":
                     current_params.append(to_num(snt[index - 1][0]))

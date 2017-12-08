@@ -1,5 +1,5 @@
+integer
+string
 character
 float
-string
 boolean
-integer

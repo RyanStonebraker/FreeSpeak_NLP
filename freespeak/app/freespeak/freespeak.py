@@ -25,5 +25,5 @@ def identify(nltext):
         for v in fullLabel[2]:
             if v not in variables:
                 variables.append(v)
-    print (variables)
+
     return (total_labeled, labeled)

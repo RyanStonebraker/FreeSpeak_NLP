@@ -1,6 +1,6 @@
-output
-this
 box
+this
 variable
 array
 deconstruction
+output

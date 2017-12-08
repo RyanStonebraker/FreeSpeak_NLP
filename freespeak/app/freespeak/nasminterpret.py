@@ -3,6 +3,7 @@ import freespeak
 import taskhandle
 import math
 import ast
+import random
 
 # Made this a function just in case the structure externs are stored changes
 # in the future
@@ -127,15 +128,14 @@ def instantiate_array(params, p_type, open_registers, index=0):
     return (array_str, flag, [loc, lbl, "array", p_type], open_registers)
 
 
-# Takes advantage of the fact that python is simply injecting text that is
-# later interpreted as HTML. Also is used to more easily identify NASM sections
+# Used to more easily identify x86 sections
 def add_section(sect):
     return "section ." + str(sect) + "\n"
 
 
-# Takes the simplified commands and converts to NASM
+# Takes the simplified commands and converts to x86
 def nl_to_nasm(labeled):
-    """NASM Assembly language pack for Freespeak NLP Engine."""
+    """x86 Assembly language pack for Freespeak NLP Engine."""
     nasmcode = ""
     loaded_externs = add_section("text")
     data_section = ""
@@ -148,13 +148,15 @@ def nl_to_nasm(labeled):
     storage_history = []
     open_registers = ["rax", "rdi", "rcx", "rdx", "r15", "r14", "r13", "r12", "r11", "r10", "r9", "r8"]
 
-    for sent in labeled:
+    for idx, sent in enumerate(labeled):
         if len(labeled) > 0:
             for tsk in sent:
-                task_stack.append(tsk)
+                task_stack.append((tsk, idx))
 
     for index, exectask in enumerate(task_stack):
-
+        # Store what sentence the task is in
+        tsk_snt = exectask[1]
+        exectask = exectask[0]
         # make == allocate space for some structure
         if exectask["TASK"] == "make":
             if exectask["STRUCTURE"] == "array":
@@ -172,13 +174,14 @@ def nl_to_nasm(labeled):
                 storage_history.append(auto_arr[2])
 
             elif exectask["STRUCTURE"] == "box":
+                local_params = exectask["PARAMETERS"]
                 if len(exectask["PARAMETERS"]) < 1:
                     continue
                 if len(exectask["PARAMETERS"]) >= 1 and "VARIABLE" in exectask["PARAMETERS"][0]:
                     vr_assign = ast.literal_eval(exectask["PARAMETERS"][0])
+                    local_params = variables[str(vr_assign[1])]
 
-                    exectask["PARAMETERS"] = variables[str(vr_assign[1])]
-                auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], "string", open_registers, index)
+                auto_arr = instantiate_array([make_box(local_params)], "string", open_registers, index)
                 if auto_arr[1] == "c_loc":
                     if "malloc" not in loaded_externs:
                         loaded_externs += load_module("malloc")
@@ -229,21 +232,46 @@ def nl_to_nasm(labeled):
         elif exectask["TASK"] == "show":
             if exectask["STRUCTURE"] == "deconstruction":
                 deconstruct = """<h4>DECONSTRUCTION:</h4><div class="line-sep"></div>""" + str(task_stack)
+
         elif exectask["TASK"] == "repeat":
             try:
                 repeat_amount = taskhandle.to_num(exectask["PARAMETERS"][0])
             except:
                 repeat_amount = 1
             if exectask["STRUCTURE"] == "this":
-                for i in range(0, repeat_amount):
-                    task_stack.insert(index + 1, task_stack[index - 1])
+                for i in range(1, repeat_amount + 1):
+                    for prev_task in labeled[tsk_snt - 1]:
+                        if prev_task != '':
+                            task_stack.insert(index + 1, (prev_task, tsk_snt))
+                del task_stack[index]
+
         elif exectask["TASK"] == "store":
             try:
                 exectask["PARAMETERS"][0] = ast.literal_eval(exectask["PARAMETERS"][0])
             except:
                 exectask["PARAMETERS"][0] = exectask["PARAMETERS"][0]
             if len(exectask["PARAMETERS"]) >= 2 and exectask["PARAMETERS"][0][0] == "VARIABLE":
+                # Store a key-value pair of variable and contents in "variables"
                 variables[exectask["PARAMETERS"][0][1]] = exectask["PARAMETERS"][1:]
+                for idx, value in enumerate(variables[exectask["PARAMETERS"][0][1]]):
+                    if "VARIABLE" in value:
+                        replace_var = ast.literal_eval(value)[1]
+                        variables[exectask["PARAMETERS"][0][1]][idx] = variables[replace_var][0]
+
+        elif exectask["TASK"] == "add":
+            if "VARIABLE" in exectask["PARAMETERS"][1]:
+                var_str = ast.literal_eval(exectask["PARAMETERS"][1])[1]
+                try:
+                    variables[var_str] = str(int(variables[var_str][0]) + int(exectask["PARAMETERS"][0]))
+                except:
+                    variables[var_str] = str(variables[var_str][0]) + str(exectask["PARAMETERS"][0])
+        elif exectask["TASK"] == "subtract":
+            if "VARIABLE" in exectask["PARAMETERS"][1]:
+                var_str = ast.literal_eval(exectask["PARAMETERS"][1])[1]
+                try:
+                    variables[var_str] = str(int(variables[var_str][0]) - int(exectask["PARAMETERS"][0]))
+                except:
+                    variables[var_str] = str(variables[var_str][0]) + str(exectask["PARAMETERS"][0])
 
     for index, dealloc in enumerate(reversed(storage_history)):
         if dealloc[0] == "register":

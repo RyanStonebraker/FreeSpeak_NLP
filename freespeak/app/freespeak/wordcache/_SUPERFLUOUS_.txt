@@ -1,13 +1,21 @@
 
-the
-more_poop
-number
-i
+counter
 tst
+add
 apples
-t
-a
+to
 p
 name
 value
 poop
+the
+more
+a
+i
+var2
+number
+var
+var1
+vars
+more_poop
+t
