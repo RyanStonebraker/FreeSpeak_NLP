@@ -14,6 +14,7 @@ sys.path.append(currDIR + "/freespeak/")
 import freespeak
 import nasminterpret
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -28,5 +29,9 @@ def interpret():
         if not natural_lang:
             return render_template("index.html")
         identified_lang = freespeak.identify(natural_lang)
-        identified_lang = nasminterpret.nl_to_nasm(identified_lang).split("\n")
-        return render_template("interpret.html", content=identified_lang, raw_text=natural_lang.replace('"', '\\"').replace("'", "\\'"))
+        snt_before = identified_lang[0]
+        identified_lang = identified_lang[1]
+        full_lang = nasminterpret.nl_to_nasm(identified_lang)
+        identified_lang = full_lang[1].split("\n")
+        dbg = str(snt_before) + "</br></br>" + full_lang[0]
+        return render_template("interpret.html", content=identified_lang, raw_text=natural_lang.replace('"', '\\"').replace("'", "\\'"), debug=dbg)

@@ -1,6 +1,10 @@
-first
 the
-every
-times
 a
+apples
+every
 all
+times
+have
+first
+number
+i

@@ -152,7 +152,7 @@ def nl_to_nasm(labeled):
             for tsk in sent:
                 task_stack.append(tsk)
 
-    loaded_externs = str(task_stack) + "\n" + loaded_externs
+    # loaded_externs = str(task_stack) + "\n" + loaded_externs # DEBUG
 
     for index, exectask in enumerate(task_stack):
 
@@ -173,6 +173,8 @@ def nl_to_nasm(labeled):
                 storage_history.append(auto_arr[2])
 
             elif exectask["STRUCTURE"] == "box":
+                if len(exectask["PARAMETERS"]) < 1:
+                    exectask["PARAMETERS"].append("test")
                 auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], "string", open_registers, index)
                 if auto_arr[1] == "c_loc":
                     if "malloc" not in loaded_externs:
@@ -253,4 +255,4 @@ def nl_to_nasm(labeled):
         nasmcode += pop_task[0]
     nasmcode += "ret\n"
 
-    return loaded_externs + nasmcode + data_section + "\n" + deconstruct
+    return (str(task_stack) + "\n" + str(labeled),loaded_externs + nasmcode + data_section + "\n" + deconstruct)

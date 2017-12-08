@@ -15,5 +15,10 @@ def identify(nltext):
 
     # sends each sentence individually to be labelled for context and
     # then puts them in a list
-    labeled = [categorizer.label(sentence) for sentence in parsed]
-    return labeled
+    labeled = []
+    total_labeled = ""
+    for sentence in parsed:
+        fullLabel = categorizer.label(sentence)
+        total_labeled += str(fullLabel[0])
+        labeled.append(fullLabel[1])
+    return (total_labeled, labeled)

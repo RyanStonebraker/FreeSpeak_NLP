@@ -88,12 +88,35 @@ h4 {
 .output button:hover {
   background: rgb(255, 255, 242);
   outline: none;
+  cursor:pointer;
 }
 
 .output button:active {
   background: rgb(255, 255, 242);
   outline: none;
   cursor: copy;
+}
+
+.debug {
+  text-decoration: none;
+  border: none;
+  width: 25%;
+  border-radius: 10px;
+  outline:none;
+  background: @bg-text;
+}
+
+.debug:hover {
+  font-weight: bold;
+  outline: none;
+  cursor:pointer;
+}
+
+.debug:active {
+  outline: none;
+  color: @bg-text;
+  background-color: @background;
+
 }
 
 .center-div {
@@ -141,6 +164,13 @@ input[name=intrnl]:active {
   .transition(all, 0.1s, ease-in);
   color: #ffffff;
   background-color: @background;
+  cursor:pointer;
+}
+
+input[name=intrnl]:hover {
+  cursor:pointer;
+  font-weight: 800;
+
 }
 
 .output {

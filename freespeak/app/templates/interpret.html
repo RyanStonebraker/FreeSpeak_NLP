@@ -1,10 +1,11 @@
 {% extends "base_template.html" %}
 {% block title %}FreeSpeak | Interpret{% endblock %}
 {% block body %}
+<button class = "debug" onclick="show_debug()">Show Internal Interpretation</button>
 <section class="output"><h4>ASSEMBLY INTERPRETATION:</h4><button onclick="ctoclip('.o_p')">Copy to Clipboard</button><div class="line-sep"></div>
   {% for line in content %}
       <p class = "o_p"
-      {% if line=="section .text" or line=="section .data"%}
+      {% if line=="section .text" or line=="section .data" %}
         style = "text-align: left; margin-bottom: 0; margin-left: 10%;"
       {% endif %}
       >{% if "~" in line %}{% for c in line %}{% if c == "~" %}{{c | replace("~", "&nbsp;") | safe}}{% endif %}{% if c != "~" %}{{c}}{% endif %}{% endfor %}{% endif %}
@@ -15,17 +16,32 @@
 </section>
 
 <script type="text/javascript">
-  $("textarea").focus().val("").val("{{raw_text|safe}}");
+  // move cursor to end of text area and populate it with text
+  $("textarea").focus().val("").val(`{{raw_text|safe}}`);
+
+  // copy to clipboard function
   function ctoclip(e) {
     var $temp = $("<textarea>");
     $("body").append($temp);
 
-    var txt = $(e).text().replace(/[ \u00A0\u1680​\u180e\u2000-\u2009\u200a​\u200b​\u202f\u205f​\u3000]/g,' ');
-    txt = txt.replace(/^\s+\t+?|\s+$/g, "");
+    var txt = $(e).text().replace(/[\u00A0\u1680​\u180e\u2000-\u2009\u200a​\u200b​\u202f\u205f​\u3000]/g,' ');
+    txt = txt.replace(/^[\n\s\t]+/g, "");
+    txt = txt.replace(/[ \s\t]+\n/g, "\n");
+    txt = txt.replace(/\n\s+|\s+\n/g, "\n")
 
     $temp.val(txt).select();
     document.execCommand("copy");
     $temp.remove();
+  }
+
+  // Show internal interpretation function
+  function show_debug() {
+    if ($(".int_intrp").length != 0) {
+      $(".int_intrp").remove();
+    }
+    else {
+      $(".output").prepend(`<div class = 'int_intrp'><h4>INTERNAL INTERPRETATION:</h4>{{debug|safe}}</br></br></div>`);
+    }
   }
 </script>
 {% endblock %}

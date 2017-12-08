@@ -186,5 +186,5 @@ def label(sentence):
 
     _unloadCache()
 
-    print (sentence)
-    return taskhandle.getcontext(sentence)
+    # print (sentence) # debug output
+    return (sentence, taskhandle.getcontext(sentence))
