@@ -17,8 +17,13 @@ def identify(nltext):
     # then puts them in a list
     labeled = []
     total_labeled = ""
+    variables = []
     for sentence in parsed:
-        fullLabel = categorizer.label(sentence)
+        fullLabel = categorizer.label(sentence, variables)
         total_labeled += str(fullLabel[0])
         labeled.append(fullLabel[1])
+        for v in fullLabel[2]:
+            if v not in variables:
+                variables.append(v)
+    print (variables)
     return (total_labeled, labeled)

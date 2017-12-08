@@ -2,7 +2,7 @@
 import freespeak
 import taskhandle
 import math
-
+import ast
 
 # Made this a function just in case the structure externs are stored changes
 # in the future
@@ -142,6 +142,7 @@ def nl_to_nasm(labeled):
     deconstruct = ""
     task_stack = []
     save_stack = []
+    variables = {}
 
     # (register|label, name)
     storage_history = []
@@ -151,8 +152,6 @@ def nl_to_nasm(labeled):
         if len(labeled) > 0:
             for tsk in sent:
                 task_stack.append(tsk)
-
-    # loaded_externs = str(task_stack) + "\n" + loaded_externs # DEBUG
 
     for index, exectask in enumerate(task_stack):
 
@@ -174,7 +173,11 @@ def nl_to_nasm(labeled):
 
             elif exectask["STRUCTURE"] == "box":
                 if len(exectask["PARAMETERS"]) < 1:
-                    exectask["PARAMETERS"].append("test")
+                    continue
+                if len(exectask["PARAMETERS"]) >= 1 and "VARIABLE" in exectask["PARAMETERS"][0]:
+                    vr_assign = ast.literal_eval(exectask["PARAMETERS"][0])
+
+                    exectask["PARAMETERS"] = variables[str(vr_assign[1])]
                 auto_arr = instantiate_array([make_box(exectask["PARAMETERS"])], "string", open_registers, index)
                 if auto_arr[1] == "c_loc":
                     if "malloc" not in loaded_externs:
@@ -234,6 +237,13 @@ def nl_to_nasm(labeled):
             if exectask["STRUCTURE"] == "this":
                 for i in range(0, repeat_amount):
                     task_stack.insert(index + 1, task_stack[index - 1])
+        elif exectask["TASK"] == "store":
+            try:
+                exectask["PARAMETERS"][0] = ast.literal_eval(exectask["PARAMETERS"][0])
+            except:
+                exectask["PARAMETERS"][0] = exectask["PARAMETERS"][0]
+            if len(exectask["PARAMETERS"]) >= 2 and exectask["PARAMETERS"][0][0] == "VARIABLE":
+                variables[exectask["PARAMETERS"][0][1]] = exectask["PARAMETERS"][1:]
 
     for index, dealloc in enumerate(reversed(storage_history)):
         if dealloc[0] == "register":
@@ -255,4 +265,4 @@ def nl_to_nasm(labeled):
         nasmcode += pop_task[0]
     nasmcode += "ret\n"
 
-    return (str(task_stack) + "\n" + str(labeled),loaded_externs + nasmcode + data_section + "\n" + deconstruct)
+    return (str(task_stack), loaded_externs + nasmcode + data_section + "\n" + deconstruct)

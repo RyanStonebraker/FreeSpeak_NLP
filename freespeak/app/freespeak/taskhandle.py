@@ -76,7 +76,7 @@ def autoConvert(params):
     if not isinstance(params, collections.Iterable):
         params = [params]
     for param in params:
-        if isinstance(param, str):
+        if isinstance(param, str) or isinstance(param, tuple):
             auto_type = "string"
             break
         elif isinstance(param, bool):
@@ -94,7 +94,14 @@ def autoConvert(params):
 # Massive function that attempts to understand what is being asked in each
 # sentence. It handles multiple commands in a single sentence by "flushing"
 # previous context when a new task word is read.
-def getcontext(snt_raw):
+def getcontext(snt_raw, variables):
+    for idx, word in enumerate(snt_raw):
+        if word[0] == "named" and len(snt_raw) > idx + 1:
+            snt_raw[idx + 1] = (snt_raw[idx + 1][0], "VARIABLE_NAME")
+            variables.append(str(snt_raw[idx + 1][0]))
+        if word[0] in variables and word[1] != "VARIABLE_NAME":
+            snt_raw[idx] = (str(("VARIABLE", snt_raw[idx][0])), "VARIABLE")
+
     snt = [wrd for wrd in snt_raw if wrd[0] != '' and wrd[1] != "SUPERFLUOUS"]
 
     # PRE-MAIN PROCESSING LOOP (HANDLES PEMDAS)
@@ -110,7 +117,6 @@ def getcontext(snt_raw):
                     snt[index - 1] = ("with", "MODIFIER")
 
             elif snt[index][0] == "divided" and len(snt) > index + 1 and snt[index - 1][1] == "NUMBER" and snt[index + 1][1] == "NUMBER":
-                # print("<script>console.log(" + str(((to_num(snt[index - 1][0]) / to_num(snt[index + 1][0])), "NUMBER")[) + ")</script>")
                 snt[index - 1] = (str(roundCutOff(to_num(snt[index - 1][0]) / to_num(snt[index + 1][0]))), "NUMBER")
                 del snt[index]
                 del snt[index]
@@ -169,11 +175,13 @@ def getcontext(snt_raw):
             continue
 
         # resets the mathematical optimization flag
-        if snt[index][0] != "plus" and snt[index][0] != "minus":
+        if snt[index][0] != "plus" and snt[index][0] != "minus" and snt[index][1] != "NUMBER":
             add_to = -1
 
         # If a task was found, then start looking for context
         if start_find:
+            if c_task == "store":
+                modForwardParams = True
             if snt[index][1] == "STRUCTURE":
                 if index - 1 > 0 and snt[index - 1][1] == "NUMBER":
                     current_params.append(to_num(snt[index - 1][0]))
@@ -185,6 +193,8 @@ def getcontext(snt_raw):
                 if snt[index][0] == "with" or snt[index][0] == "include" or snt[index][0] == "of":
                     modForwardParams = True
                     continue
+                if snt[index][0] == "named":
+                    current_params.insert(0, ("VARIABLE", str(snt[index + 1][0])))
 
                 if snt[index][0] == "plus" or snt[index][0] == "minus":
                     if (snt[index - 1][1] == "PARAMETER" or snt[index - 1][1] == "NUMBER") and snt[index + 1][1] == "NUMBER":
@@ -198,7 +208,11 @@ def getcontext(snt_raw):
                             current_params[add_to] -= to_num(snt[index + 1][0])
                             if to_num(snt[index + 1][0]) % 1 != 0:
                                 current_params[add_to] = roundCutOff(current_params[add_to])
-                        skip_iter = True
+
+                        del snt[index - 1]
+                        if snt[index + 1][0] != "plus" and snt[index + 1][0] != "minus" and snt[index + 1][1] != "NUMBER":
+                            del snt[index + 1]
+
                         continue
 
                 if snt[index][0] == "through":
@@ -217,10 +231,10 @@ def getcontext(snt_raw):
                 c_type = snt[index][0]
                 continue
 
-            if modForwardParams and (snt[index][1] != "NUMBER" and snt[index][1] != "STRING" and snt[index][1] != "BOOLEAN"):
+            if modForwardParams and (snt[index][1] != "NUMBER" and snt[index][1] != "STRING" and snt[index][1] != "BOOLEAN") and snt[index][1] != "VARIABLE":
                 modForwardParams = False
 
-            if modForwardParams and (snt[index][1] == "NUMBER" or snt[index][1] == "STRING" or snt[index][1] == "BOOLEAN"):
+            if modForwardParams and (snt[index][1] == "NUMBER" or snt[index][1] == "STRING" or snt[index][1] == "BOOLEAN") or snt[index][1] == "VARIABLE":
                 current_params.append(maybe_num(snt[index][0]))
                 snt[index] = (snt[index][0], "PARAMETER")
                 continue
@@ -240,4 +254,4 @@ def getcontext(snt_raw):
         if snt[index][1] == "NUMBER" or snt[index][0] == "":
             snt.pop(index)
 
-    return ordered_jobs
+    return (ordered_jobs, variables)

@@ -166,7 +166,7 @@ checkNumEnd = re.compile(r"(\s[0-9]+)((?:rd|th|st|nd))\s", re.IGNORECASE)
 
 # replaces conjunction words with spaces and symbols to words and returns a
 # copy of the original sentence passed paired with each word's labels
-def label(sentence):
+def label(sentence, variables):
     _loadCache()
 
     sentence = sentence.replace("  ", " ")
@@ -186,5 +186,7 @@ def label(sentence):
 
     _unloadCache()
 
+    ctx = taskhandle.getcontext(sentence, variables)
+
     # print (sentence) # debug output
-    return (sentence, taskhandle.getcontext(sentence))
+    return (sentence, ctx[0], ctx[1])

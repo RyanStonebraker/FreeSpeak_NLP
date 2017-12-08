@@ -1,6 +1,6 @@
-show
+repeat
 deconstruct
+show
+store
 make
 print
-repeat
-store
