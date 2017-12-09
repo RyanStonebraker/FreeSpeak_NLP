@@ -3,6 +3,15 @@ Minimally structured English language that is interpreted to x86 syntax assembly
 ___
 
 ### Change Log:
+####    12/8
+* Fixed string escaping problems
+* Added singular variable declarations
+* Added ability to modify variables
+* Added repeat functionality to emulate looping
+* Fixed box subroutine so that it works with non-string types
+* Added copy to clipboard button
+* Added "Show Internal Interpretation" button to show debugging info
+
 ####    11/29
 * HTTPS certificate signed by LetsEncrypt
 * Firewalls configured on Live Server
@@ -36,10 +45,8 @@ ___
 * Inner-array accessor functions
 * Stand alone (non-array) values
 * Ability to perform non pre-optimized mathematical operations that are shown in outputted assembly.
-* More external view controls (Make font bigger, show output, Copy everything to clipboard, etc.)
 * Adding support for:
   * conditional statements
-  * loops
   * A(n) [OBJECT] is ... style function declarations
 
 #### Reach/Future Goals:
@@ -55,6 +62,12 @@ ___
 * ***"Create a matrix of booleans with 1.2, True, False, 0, 1, and 2 - 5."***
 
 * ***"Make an array of values with "cat", "dog", "monkey", 123, 1.23, True, then create another array of strings with the values "cat", "big dog", 1 through 3 incrementing by 0.5. Finally, construct another array of values "test", "testing test test", and 1.2345. Print the 2nd array."***
+
+* ***"Make a box with "test1". Then make a box with "test2". Lastly, make a box with "test3". Print the 2nd box, print the 1st box, and then print the 3rd box."***
+
+* ***"Make a box with "test" and print this. repeat this 3 times."***
+
+* ***"Store 3 in a variable called apples. Store apples in a variable named oranges.Add 1 to oranges and then make a box with oranges and then print this. Repeat this 6 more times. Make a box with apples and print this."***
 
 #### Installation:
 ##### Python Flask Implementation:
