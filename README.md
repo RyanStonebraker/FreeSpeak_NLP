@@ -1,5 +1,5 @@
 # FreeSpeak Natural Language Interpreter
-Minimally structured English language that is interpreted to x86 syntax assembly. Code refactored to a Python Flask application and live version hosted on nginx using uwsgi.
+Minimally structured English language that is interpreted to x86 syntax assembly. Code refactored to a Python Flask application and live version hosted on nginx using uwsgi. Due to having a "repeat this sentence X times." conditional looping functionality that re-does the last sentence x times, a "store 5 in var1." variable storage system, and a "add 1 to var1." variable modification ability, this language is technically Turing complete. 
 ___
 
 ### Change Log:
@@ -48,11 +48,14 @@ ___
 * Adding support for:
   * conditional statements
   * A(n) [OBJECT] is ... style function declarations
+* Random number generation
 
 #### Reach/Future Goals:
 * Speech to text
 * Complete code refactoring to utilize a supervised machine learning algorithm, possibly with TensorFlow
-* Ability to pass the so-called Turing test for esoteric languages
+* Add the ability to generate graphics by generating an HTML5 canvas and corresponding javascript
+* Add internal language functionality so that a task can be generated without converting to NASM (Ex. Print a box prints a box + the code)
+* Ability to define and create a simple backpropogation neural network completely in the English language using FreeSpeak
 
 #### Example Usages:
 * ***"Build a box with the text "This is a box.". Then, print this box."***
