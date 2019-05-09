@@ -1,21 +1,43 @@
 
-counter
-tst
-add
-apples
+another
+"make a box with "test1
+oranges
 to
-p
-name
-value
-poop
-the
-more
-a
-i
-var2
-number
+counter
+text
+incrementing
+it
+first
+array.
+tst
+"build a box with the text "this
+"make a box with "test
 var
-var1
-vars
-more_poop
+poop
+"make an array of values with "cat" "dog" "monkey" 123 1.23 true then create another array of strings with the values "cat" "big
+name
+add
+var2
+finally
+times.
+p
 t
+more_poop
+values
+more
+box.
+is
+var1
+oranges.add
+i
+an
+a
+vars
+apples
+the
+number
+dog
+value
+this.
+"
+" 

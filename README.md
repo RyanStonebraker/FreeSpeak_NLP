@@ -1,6 +1,8 @@
 # FreeSpeak Natural Language Interpreter
-Minimally structured English language that is interpreted to x86 syntax assembly. Code refactored to a Python Flask application and live version hosted on nginx using uwsgi. Due to having a "repeat this sentence X times." conditional looping functionality that re-does the last sentence x times, a "store 5 in var1." variable storage system, and a "add 1 to var1." variable modification ability, this language is technically Turing complete. 
+Minimally structured English language is interpreted down to x86 syntax assembly. Code refactored to a Python Flask application and live version hosted on nginx using uwsgi. Due to having a "repeat this sentence X times." conditional looping functionality that re-does the last sentence x times, a "store 5 in var1." variable storage system, and an "add 1 to var1." variable modification ability, this language is technically Turing complete (in a very loose sense).
 ___
+
+![](readme/freespeak.gif)
 
 ### Change Log:
 ####    12/8

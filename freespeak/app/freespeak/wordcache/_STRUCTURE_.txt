@@ -1,6 +1,6 @@
 box
-this
-variable
-array
 deconstruction
+variable
 output
+this
+array
